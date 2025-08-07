@@ -1,53 +1,51 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { PoemSidebar } from '@/components/PoemSidebar';
 import { PoemCard } from '@/components/PoemCard';
 import { EmailSignup } from '@/components/EmailSignup';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useUI } from '@/contexts/UIContext';
 import { Button } from '@mond-design-system/theme';
 import { Poem } from '@/types';
-import mockPoemsData from '@/data/mock-poems.json';
+import { getPoems, listenToPoems } from '@/lib/firebaseService';
 
 const POEMS_PER_PAGE = 5;
 
 export default function Home() {
   const { theme } = useTheme();
+  const { currentPage, setCurrentPage } = useUI();
+  const searchParams = useSearchParams();
   const [selectedPoem, setSelectedPoem] = useState<Poem | null>(null);
   const [allPoems, setAllPoems] = useState<Poem[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
   // Clear any stored poem selection on page load to ensure we show the main feed
   useEffect(() => {
     localStorage.removeItem('selectedPoemId');
-  }, []);
+    
+    // Check for page parameter in URL and update current page
+    const pageParam = searchParams.get('page');
+    if (pageParam) {
+      const pageNumber = parseInt(pageParam, 10);
+      if (pageNumber > 0) {
+        setCurrentPage(pageNumber);
+      }
+    }
+  }, [searchParams, setCurrentPage]);
 
   useEffect(() => {
-    // Load and organize poems
-    const loadPoems = () => {
-      const poems: Poem[] = mockPoemsData.map((poem) => ({
-        ...poem,
-        createdAt: new Date(poem.createdAt),
-        updatedAt: new Date(poem.updatedAt),
-      }));
-
-      // Sort by creation date, with pinned poems first
-      const sortedPoems = poems
-        .filter((poem) => poem.published)
-        .sort((a, b) => {
-          // Pinned poems go first
-          if (a.pinned && !b.pinned) return -1;
-          if (!a.pinned && b.pinned) return 1;
-          // Then sort by creation date (newest first)
-          return b.createdAt.getTime() - a.createdAt.getTime();
-        });
-
-      setAllPoems(sortedPoems);
+    // Set up real-time listener for poems
+    const unsubscribe = listenToPoems((poems) => {
+      // Filter out pinned poems from main feed
+      const filteredPoems = poems.filter(poem => !poem.pinned);
+      setAllPoems(filteredPoems);
       setLoading(false);
-    };
+    });
 
-    loadPoems();
+    // Cleanup function
+    return () => unsubscribe();
   }, []);
 
   const handlePoemSelect = (poem: Poem) => {

@@ -11,6 +11,9 @@ interface UIContextType {
   setSelectedPoemId: (id: string | null) => void;
   clearSelectedPoem: () => void;
   isMobile: boolean;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+  resetPagination: () => void;
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined);
@@ -19,6 +22,7 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Will be set properly in useEffect
   const [selectedPoemId, setSelectedPoemId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [currentPage, setCurrentPageState] = useState(1);
 
   useEffect(() => {
     // Check if we're on mobile and adjust sidebar accordingly
@@ -89,6 +93,24 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('selectedPoemId');
   };
 
+  const setCurrentPage = (page: number) => {
+    setCurrentPageState(page);
+    localStorage.setItem('currentPage', page.toString());
+  };
+
+  const resetPagination = () => {
+    setCurrentPageState(1);
+    localStorage.removeItem('currentPage');
+  };
+
+  // Load current page from localStorage on mount
+  useEffect(() => {
+    const savedPage = localStorage.getItem('currentPage');
+    if (savedPage) {
+      setCurrentPageState(parseInt(savedPage, 10));
+    }
+  }, []);
+
   return (
     <UIContext.Provider
       value={{
@@ -100,6 +122,9 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
         setSelectedPoemId: handleSetSelectedPoemId,
         clearSelectedPoem,
         isMobile,
+        currentPage,
+        setCurrentPage,
+        resetPagination,
       }}
     >
       {children}

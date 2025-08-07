@@ -29,6 +29,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
       Color,
     ],
     content,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
@@ -49,6 +50,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
       <div className="flex items-center gap-2 p-3 border-b border-border bg-muted/30">
         <div className="flex items-center gap-1">
           <Button
+            type="button"
             variant={editor.isActive('bold') ? 'primary' : 'ghost'}
             size="sm"
             isDarkMode={theme === 'dark'}
@@ -58,6 +60,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
             B
           </Button>
           <Button
+            type="button"
             variant={editor.isActive('italic') ? 'primary' : 'ghost'}
             size="sm"
             isDarkMode={theme === 'dark'}
@@ -67,6 +70,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
             I
           </Button>
           <Button
+            type="button"
             variant={editor.isActive('underline') ? 'primary' : 'ghost'}
             size="sm"
             isDarkMode={theme === 'dark'}
@@ -81,6 +85,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
 
         <div className="flex items-center gap-1">
           <Button
+            type="button"
             variant={editor.isActive({ textAlign: 'left' }) ? 'primary' : 'ghost'}
             size="sm"
             isDarkMode={theme === 'dark'}
@@ -89,6 +94,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
             ⬅️
           </Button>
           <Button
+            type="button"
             variant={editor.isActive({ textAlign: 'center' }) ? 'primary' : 'ghost'}
             size="sm"
             isDarkMode={theme === 'dark'}
@@ -97,6 +103,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
             ↔️
           </Button>
           <Button
+            type="button"
             variant={editor.isActive({ textAlign: 'right' }) ? 'primary' : 'ghost'}
             size="sm"
             isDarkMode={theme === 'dark'}
@@ -110,6 +117,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
 
         <div className="flex items-center gap-1">
           <Button
+            type="button"
             variant={editor.isActive('blockquote') ? 'primary' : 'ghost'}
             size="sm"
             isDarkMode={theme === 'dark'}
@@ -118,6 +126,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
             ❝❞
           </Button>
           <Button
+            type="button"
             variant="ghost"
             size="sm"
             isDarkMode={theme === 'dark'}

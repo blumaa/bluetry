@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@mond-design-system/theme';
 import { TiptapEditor } from '@/components/TiptapEditor';
+import { createPoem } from '@/lib/firebaseService';
 
 interface User {
   id: string;
@@ -16,9 +18,12 @@ interface User {
 export default function CreatePage() {
   const router = useRouter();
   const { theme } = useTheme();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { currentUser, loading } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
   
   // Form state
   const [title, setTitle] = useState('');
@@ -27,55 +32,47 @@ export default function CreatePage() {
   const [isPinned, setIsPinned] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated and admin
-    const isAuthenticated = localStorage.getItem('isAuthenticated');
-    const userData = localStorage.getItem('user');
-
-    if (isAuthenticated && userData) {
-      const parsedUser = JSON.parse(userData);
-      if (parsedUser.isAdmin) {
-        setUser(parsedUser);
-      } else {
+    if (!loading) {
+      if (!currentUser) {
+        router.push('/login');
+      } else if (!currentUser.isAdmin) {
         router.push('/');
       }
-    } else {
-      router.push('/login');
     }
-    setLoading(false);
-  }, [router]);
+  }, [currentUser, loading, router]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!currentUser) {
+      setNotification({
+        message: 'You must be logged in to create poems',
+        type: 'error'
+      });
+      return;
+    }
+    
     if (!title.trim() || !content.trim()) {
-      alert('Please fill in both title and content');
+      setNotification({
+        message: 'Please fill in both title and content',
+        type: 'error'
+      });
       return;
     }
 
     setSaving(true);
 
     try {
-      // Mock save operation - in real app this would save to database
-      const newPoem = {
-        id: `poem-${Date.now()}`,
+      await createPoem({
         title: title.trim(),
         content: content,
-        authorId: user?.id || 'admin-1',
+        authorId: currentUser.id,
         published: isPublished,
         pinned: isPinned,
         likeCount: 0,
         commentCount: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      // Save to localStorage for demo purposes
-      const existingPoems = JSON.parse(localStorage.getItem('customPoems') || '[]');
-      existingPoems.unshift(newPoem);
-      localStorage.setItem('customPoems', JSON.stringify(existingPoems));
-
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+        viewCount: 0,
+      });
 
       // Reset form
       setTitle('');
@@ -83,11 +80,21 @@ export default function CreatePage() {
       setIsPublished(false);
       setIsPinned(false);
 
-      alert('Poem saved successfully!');
-      router.push('/admin');
+      setNotification({
+        message: 'Poem saved successfully!',
+        type: 'success'
+      });
+      
+      // Redirect after showing success message
+      setTimeout(() => {
+        router.push('/');
+      }, 1500);
     } catch (error) {
       console.error('Error saving poem:', error);
-      alert('Error saving poem. Please try again.');
+      setNotification({
+        message: 'Error saving poem. Please try again.',
+        type: 'error'
+      });
     } finally {
       setSaving(false);
     }
@@ -96,10 +103,10 @@ export default function CreatePage() {
   const handleCancel = () => {
     if (title || content) {
       if (confirm('Are you sure you want to discard your changes?')) {
-        router.push('/admin');
+        router.push('/');
       }
     } else {
-      router.push('/admin');
+      router.push('/');
     }
   };
 
@@ -111,13 +118,24 @@ export default function CreatePage() {
     );
   }
 
-  if (!user) {
+  if (!currentUser || !currentUser.isAdmin) {
     return null; // Will redirect
   }
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto p-6">
+        {/* Notification */}
+        {notification && (
+          <div className={`mb-6 p-4 rounded-lg border ${
+            notification.type === 'success' 
+              ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
+              : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
+          }`}>
+            {notification.message}
+          </div>
+        )}
+        
         <form onSubmit={handleSave} className="space-y-8">
           {/* Header */}
           <div className="flex items-center justify-between">

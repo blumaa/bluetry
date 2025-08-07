@@ -1,0 +1,72 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection - users can read/write their own document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null; // Allow reading other users for display purposes
+    }
+    
+    // Poems collection
+    match /poems/{poemId} {
+      // Anyone can read published poems (including anonymous users)
+      allow read: if resource.data.published == true;
+      // Authenticated users can read all poems (including unpublished for admin/author)
+      allow read: if request.auth != null;
+      // Only authenticated users can create poems
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.authorId;
+      // Anyone can update like/comment counts (for anonymous likes)
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount', 'commentCount']);
+      // Only author or admin can update other fields or delete poems
+      allow update, delete: if request.auth != null && 
+        (request.auth.uid == resource.data.authorId || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+    }
+    
+    // Likes collection - for tracking poem likes
+    match /likes/{likeId} {
+      // Users can create likes for themselves
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      // Users can read their own likes
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      // Users can delete their own likes (unlike)
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      // Allow reading likes for checking if poem is liked
+      allow read: if request.auth != null;
+    }
+    
+    // Comments collection
+    match /comments/{commentId} {
+      // Anyone can read comments
+      allow read: if true;
+      // Only authenticated users can create comments
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.authorId;
+      // Only comment author or admin can update/delete comments
+      allow update, delete: if request.auth != null && 
+        (request.auth.uid == resource.data.authorId || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+    }
+    
+    // Activity collection - for tracking user actions
+    match /activity/{activityId} {
+      // Only admins can read activity logs
+      allow read: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      // System can create activity logs (authenticated users)
+      allow create: if request.auth != null;
+    }
+    
+    // Subscribers collection - for email subscriptions
+    match /subscribers/{subscriberId} {
+      // Only admins can read subscriber lists
+      allow read: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      // Anyone can create subscriptions (for signup form)
+      allow create: if true;
+      // Only admins can update/delete subscriptions
+      allow update, delete: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+  }
+}

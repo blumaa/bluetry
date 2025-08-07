@@ -10,10 +10,11 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 export function Header() {
   const { currentUser, loading, logout } = useAuth();
   const { theme } = useTheme();
-  const { toggleSidebar, clearSelectedPoem } = useUI();
+  const { toggleSidebar, clearSelectedPoem, resetPagination } = useUI();
 
   const handleHomeClick = () => {
     clearSelectedPoem(); // Clear selected poem to show main feed
+    resetPagination(); // Reset pagination to page 1
   };
 
   return (

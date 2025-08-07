@@ -6,8 +6,9 @@ import { useUI } from '@/contexts/UIContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@mond-design-system/theme';
 import { Poem } from '@/types';
-import { formatRelativeTime } from '@/lib/utils';
-import mockPoemsData from '@/data/mock-poems.json';
+import { formatRelativeTime, getPoemUrl } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { getPinnedPoems, listenToPoems } from '@/lib/firebaseService';
 
 interface PoemSidebarProps {
   onPoemSelect: (poem: Poem) => void;
@@ -16,30 +17,36 @@ interface PoemSidebarProps {
 export function PoemSidebar({ onPoemSelect }: PoemSidebarProps) {
   const { isSidebarOpen, closeSidebar, selectedPoemId, setSelectedPoemId, isMobile } = useUI();
   const { theme } = useTheme();
+  const router = useRouter();
   const [poems, setPoems] = useState<Poem[]>([]);
   const [pinnedPoems, setPinnedPoems] = useState<Poem[]>([]);
 
   useEffect(() => {
-    // Load and organize poems
-    const allPoems: Poem[] = mockPoemsData.map(poem => ({
-      ...poem,
-      createdAt: new Date(poem.createdAt),
-      updatedAt: new Date(poem.updatedAt),
-    }));
+    // Load pinned poems
+    const loadPinnedPoems = async () => {
+      try {
+        const pinned = await getPinnedPoems();
+        setPinnedPoems(pinned);
+      } catch (error) {
+        console.error('Error loading pinned poems:', error);
+      }
+    };
 
-    const pinned = allPoems.filter(poem => poem.pinned && poem.published);
-    const regular = allPoems.filter(poem => !poem.pinned && poem.published);
+    // Set up real-time listener for regular poems (excluding pinned ones)
+    const unsubscribe = listenToPoems((allPoems) => {
+      const regular = allPoems.filter(poem => !poem.pinned);
+      setPoems(regular.slice(0, 20)); // Limit to most recent 20 for sidebar
+    });
 
-    setPinnedPoems(pinned);
-    setPoems(regular);
+    loadPinnedPoems();
 
-    // Only auto-select if there's already a selected poem ID in localStorage
-    // Don't auto-select on first visit - let main page show the feed
-  }, [selectedPoemId, setSelectedPoemId, onPoemSelect]);
+    // Cleanup function
+    return () => unsubscribe();
+  }, []);
 
   const handlePoemClick = (poem: Poem) => {
-    setSelectedPoemId(poem.id);
-    onPoemSelect(poem);
+    // Navigate to poem page (same behavior as clicking poem cards)
+    router.push(getPoemUrl(poem));
     
     // Close sidebar on mobile after selection
     if (isMobile) {

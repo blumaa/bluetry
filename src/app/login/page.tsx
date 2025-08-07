@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@mond-design-system/theme';
@@ -9,37 +11,44 @@ import { Button } from '@mond-design-system/theme';
 export default function LoginPage() {
   const router = useRouter();
   const { theme } = useTheme();
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Clear any existing mock authentication
+  useEffect(() => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('user');
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    // Mock authentication
-    if (username === 'test' && password === 'test') {
-      // Simulate API call delay
-      setTimeout(() => {
-        // Mock setting admin user in localStorage
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('user', JSON.stringify({
-          id: 'admin-1',
-          email: 'admin@bluetry.com',
-          displayName: 'Admin User',
-          isAdmin: true,
-        }));
-        
-        setIsLoading(false);
-        router.push('/admin');
-      }, 1000);
-    } else {
-      setTimeout(() => {
-        setError('Invalid username or password. Use "test" for both fields.');
-        setIsLoading(false);
-      }, 1000);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // AuthContext will handle the user state and redirect
+      router.push('/');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      
+      let errorMessage = 'Failed to sign in. Please try again.';
+      
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email address.';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Incorrect password.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many failed attempts. Please try again later.';
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,16 +66,16 @@ export default function LoginPage() {
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-foreground mb-2">
-                Username
+              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+                Email
               </label>
               <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-                placeholder="Enter your username"
+                placeholder="Enter your email"
                 disabled={isLoading}
                 required
               />

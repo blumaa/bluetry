@@ -40,7 +40,7 @@ export function EmailSignup() {
           createdAt: new Date(),
         });
         
-        setMessage('Successfully subscribed! Thank you for joining our community.');
+        setMessage('Subscribed');
         setIsSuccess(true);
         setEmail('');
       }

@@ -61,3 +61,28 @@ export function removeLikedPoem(poemId: string): void {
 export function isLikedPoem(poemId: string): boolean {
   return getLikedPoems().includes(poemId);
 }
+
+// URL slug utilities for poems
+export function createSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+    .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+}
+
+export function findPoemBySlugOrId(poems: any[], slugOrId: string): any | null {
+  // First try to find by slug (generated from title)
+  const bySlug = poems.find(poem => createSlug(poem.title) === slugOrId);
+  if (bySlug) return bySlug;
+  
+  // Fallback to finding by ID
+  const byId = poems.find(poem => poem.id === slugOrId);
+  return byId || null;
+}
+
+export function getPoemUrl(poem: { title: string; id: string }): string {
+  const slug = createSlug(poem.title);
+  return `/poem/${slug}`;
+}

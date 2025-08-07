@@ -3,30 +3,34 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PoemCard } from '@/components/PoemCard';
+import { CommentsSection } from '@/components/CommentsSection';
 import { Button } from '@mond-design-system/theme';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Poem } from '@/types';
-import mockPoemsData from '@/data/mock-poems.json';
+import { findPoemBySlugOrId } from '@/lib/utils';
+import { getPoems } from '@/lib/firebaseService';
 
 export default function PoemPage() {
   const params = useParams();
   const router = useRouter();
   const { theme } = useTheme();
+  const { currentUser } = useAuth();
   const [poem, setPoem] = useState<Poem | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadPoem = () => {
+    const loadPoem = async () => {
       try {
-        const poemId = params.id as string;
-        const foundPoem = mockPoemsData.find((p) => p.id === poemId);
+        const slugOrId = params.id as string;
+        // Anonymous users can only see published poems, authenticated users can see all
+        const publishedOnly = !currentUser;
+        const poems = await getPoems(publishedOnly);
+        
+        const foundPoem = findPoemBySlugOrId(poems, slugOrId);
 
         if (foundPoem) {
-          setPoem({
-            ...foundPoem,
-            createdAt: new Date(foundPoem.createdAt),
-            updatedAt: new Date(foundPoem.updatedAt),
-          });
+          setPoem(foundPoem);
         }
       } catch (error) {
         console.error('Error loading poem:', error);
@@ -36,10 +40,16 @@ export default function PoemPage() {
     };
 
     loadPoem();
-  }, [params.id]);
+  }, [params.id, currentUser]);
 
   const handleBackClick = () => {
-    router.push('/');
+    // Check if there's a saved page to return to
+    const savedPage = localStorage.getItem('currentPage');
+    if (savedPage) {
+      router.push(`/?page=${savedPage}`);
+    } else {
+      router.push('/');
+    }
   };
 
   if (loading) {
@@ -72,9 +82,12 @@ export default function PoemPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto p-6">
-        <div className="">
+        <div className="space-y-8">
           {/* Poem Display */}
           <PoemCard poem={poem} showFullContent={true} />
+
+          {/* Comments Section - Temporarily disabled until Firebase index is created */}
+          {/* <CommentsSection poemId={poem.id} poemTitle={poem.title} /> */}
 
           {/* Additional Actions */}
           <div className="flex justify-center pt-8">
