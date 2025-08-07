@@ -1,0 +1,145 @@
+'use client';
+
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import TextAlign from '@tiptap/extension-text-align';
+import Typography from '@tiptap/extension-typography';
+import { TextStyle } from '@tiptap/extension-text-style';
+import { Color } from '@tiptap/extension-color';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Button } from '@mond-design-system/theme';
+
+interface TiptapEditorProps {
+  content: string;
+  onChange: (content: string) => void;
+  placeholder?: string;
+}
+
+export function TiptapEditor({ content, onChange, placeholder = 'Start writing your poem...' }: TiptapEditorProps) {
+  const { theme } = useTheme();
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      Typography,
+      TextStyle,
+      Color,
+    ],
+    content,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
+    editorProps: {
+      attributes: {
+        class: 'prose prose-lg max-w-none focus:outline-none min-h-[300px] p-4',
+      },
+    },
+  });
+
+  if (!editor) {
+    return <div className="h-[400px] bg-muted animate-pulse rounded-lg" />;
+  }
+
+  return (
+    <div className="border border-input rounded-lg overflow-hidden bg-background">
+      {/* Toolbar */}
+      <div className="flex items-center gap-2 p-3 border-b border-border bg-muted/30">
+        <div className="flex items-center gap-1">
+          <Button
+            variant={editor.isActive('bold') ? 'primary' : 'ghost'}
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            onClick={() => editor.chain().focus().toggleBold().run()}
+            disabled={!editor.can().chain().focus().toggleBold().run()}
+          >
+            B
+          </Button>
+          <Button
+            variant={editor.isActive('italic') ? 'primary' : 'ghost'}
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            disabled={!editor.can().chain().focus().toggleItalic().run()}
+          >
+            I
+          </Button>
+          <Button
+            variant={editor.isActive('underline') ? 'primary' : 'ghost'}
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            disabled={!editor.can().chain().focus().toggleStrike().run()}
+          >
+            U
+          </Button>
+        </div>
+
+        <div className="w-px h-6 bg-border" />
+
+        <div className="flex items-center gap-1">
+          <Button
+            variant={editor.isActive({ textAlign: 'left' }) ? 'primary' : 'ghost'}
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          >
+            ⬅️
+          </Button>
+          <Button
+            variant={editor.isActive({ textAlign: 'center' }) ? 'primary' : 'ghost'}
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          >
+            ↔️
+          </Button>
+          <Button
+            variant={editor.isActive({ textAlign: 'right' }) ? 'primary' : 'ghost'}
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          >
+            ➡️
+          </Button>
+        </div>
+
+        <div className="w-px h-6 bg-border" />
+
+        <div className="flex items-center gap-1">
+          <Button
+            variant={editor.isActive('blockquote') ? 'primary' : 'ghost'}
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          >
+            ❝❞
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            onClick={() => editor.chain().focus().setHardBreak().run()}
+          >
+            ⤵️
+          </Button>
+        </div>
+      </div>
+
+      {/* Editor Content */}
+      <div className="relative">
+        <EditorContent 
+          editor={editor} 
+          className="prose prose-lg max-w-none [&_.ProseMirror]:min-h-[300px] [&_.ProseMirror]:p-4 [&_.ProseMirror]:outline-none [&_.ProseMirror]:font-serif [&_.ProseMirror]:leading-relaxed"
+        />
+        {editor.isEmpty && (
+          <div className="absolute top-4 left-4 text-muted-foreground pointer-events-none">
+            {placeholder}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

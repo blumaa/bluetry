@@ -1,103 +1,199 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { PoemSidebar } from '@/components/PoemSidebar';
+import { PoemCard } from '@/components/PoemCard';
+import { EmailSignup } from '@/components/EmailSignup';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Button } from '@mond-design-system/theme';
+import { Poem } from '@/types';
+import mockPoemsData from '@/data/mock-poems.json';
+
+const POEMS_PER_PAGE = 5;
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const { theme } = useTheme();
+  const [selectedPoem, setSelectedPoem] = useState<Poem | null>(null);
+  const [allPoems, setAllPoems] = useState<Poem[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Clear any stored poem selection on page load to ensure we show the main feed
+  useEffect(() => {
+    localStorage.removeItem('selectedPoemId');
+  }, []);
+
+  useEffect(() => {
+    // Load and organize poems
+    const loadPoems = () => {
+      const poems: Poem[] = mockPoemsData.map((poem) => ({
+        ...poem,
+        createdAt: new Date(poem.createdAt),
+        updatedAt: new Date(poem.updatedAt),
+      }));
+
+      // Sort by creation date, with pinned poems first
+      const sortedPoems = poems
+        .filter((poem) => poem.published)
+        .sort((a, b) => {
+          // Pinned poems go first
+          if (a.pinned && !b.pinned) return -1;
+          if (!a.pinned && b.pinned) return 1;
+          // Then sort by creation date (newest first)
+          return b.createdAt.getTime() - a.createdAt.getTime();
+        });
+
+      setAllPoems(sortedPoems);
+      setLoading(false);
+    };
+
+    loadPoems();
+  }, []);
+
+  const handlePoemSelect = (poem: Poem) => {
+    setSelectedPoem(poem);
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(allPoems.length / POEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * POEMS_PER_PAGE;
+  const currentPoems = allPoems.slice(startIndex, startIndex + POEMS_PER_PAGE);
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="flex h-[calc(100vh-3.5rem)]">
+      {' '}
+      {/* Account for header height */}
+      {/* Left Sidebar */}
+      <PoemSidebar onPoemSelect={handlePoemSelect} />
+      {/* Main Content Area */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Main Poem Feed */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-4xl mx-auto p-6">
+            {selectedPoem ? (
+              // Individual poem view (when selected from sidebar)
+              <div className="space-y-8">
+                <div className="flex items-center justify-between">
+                  <Button
+                    variant="ghost"
+                    isDarkMode={theme === 'dark'}
+                    onClick={() => setSelectedPoem(null)}
+                    className="flex items-center gap-2"
+                  >
+                    ← Back to All Poems
+                  </Button>
+                </div>
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold text-foreground mb-2">{selectedPoem.title}</h1>
+                </div>
+                <PoemCard poem={selectedPoem} showFullContent={true} />
+              </div>
+            ) : (
+              // Main poem feed with pagination
+              <div className="space-y-8">
+                <div className="text-center">
+                  {/* <h1 className="text-4xl font-bold text-foreground mb-4">Welcome to bluetry</h1> */}
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-4 py-4">
+                      <Button
+                        variant="outline"
+                        isDarkMode={theme === 'dark'}
+                        onClick={goToPreviousPage}
+                        disabled={currentPage === 1}
+                      >
+                        ←
+                      </Button>
+
+                      <div className="flex items-center gap-2">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                          <Button
+                            key={page}
+                            variant={currentPage === page ? 'primary' : 'ghost'}
+                            size="sm"
+                            isDarkMode={theme === 'dark'}
+                            onClick={() => goToPage(page)}
+                          >
+                            {page}
+                          </Button>
+                        ))}
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        isDarkMode={theme === 'dark'}
+                        onClick={goToNextPage}
+                        disabled={currentPage === totalPages}
+                      >
+                        →
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Page info */}
+                  <div className="text-center text-sm text-muted-foreground">
+                    Showing {startIndex + 1}-
+                    {Math.min(startIndex + POEMS_PER_PAGE, allPoems.length)} of {allPoems.length}{' '}
+                    poems
+                    {currentPage > 1 && ` • Page ${currentPage} of ${totalPages}`}
+                  </div>
+                </div>
+
+                {loading ? (
+                  <div className="space-y-6">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="h-48 bg-muted animate-pulse rounded-lg" />
+                    ))}
+                  </div>
+                ) : (
+                  <>
+                    {/* Poems List */}
+                    <div className="space-y-8">
+                      {currentPoems.map((poem) => (
+                        <PoemCard key={poem.id} poem={poem} showFullContent={true} />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Right Sidebar - Only on larger screens */}
+        <aside className="hidden xl:block w-80 border-border overflow-y-auto">
+          <div className="p-6 space-y-6">
+            <EmailSignup />
+
+          {/*   <div className="bg-muted/50 rounded-lg p-6"> */}
+          {/*     <h3 className="font-semibold text-foreground mb-3">About bluetry</h3> */}
+          {/*     <p className="text-sm text-muted-foreground"> */}
+          {/*       Discover beautiful poetry and share your own verses with a community that */}
+          {/*       appreciates the art of words. */}
+          {/*     </p> */}
+          {/*   </div> */}
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }
