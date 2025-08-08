@@ -97,4 +97,4 @@
 
 ### more revisions
 - make sure ALL buttons on website are from mond-design-system
-- when you click on content of poemCard it should not be a link to individual poem card
+- when you click on content (text) of poemCard it should not be a link to individual poem card
