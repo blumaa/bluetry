@@ -1,72 +1,9 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #0f172a;
-  /* Light mode colors - matching aaronblum.co */
-  --primary: #0ea5e9;
-  --primary-foreground: #ffffff;
-  --secondary: #f8fafc;
-  --secondary-foreground: #475569;
-  --accent: #f8fafc;
-  --accent-foreground: #475569;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --border: #e2e8f0;
-  --input: #f1f5f9;
-  --ring: #0ea5e9;
-}
-
-.dark {
-  --background: #0f172a;
-  --foreground: #f1f5f9;
-  /* Dark mode colors - matching aaronblum.co dark theme */
-  --primary: #0ea5e9;
-  --primary-foreground: #ffffff;
-  --secondary: #1e293b;
-  --secondary-foreground: #cbd5e1;
-  --accent: #1e293b;
-  --accent-foreground: #cbd5e1;
-  --muted: #334155;
-  --muted-foreground: #94a3b8;
-  --card: #1e293b;
-  --card-foreground: #f1f5f9;
-  --border: #475569;
-  --input: #334155;
-  --ring: #0ea5e9;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* Base styles - no more CSS custom properties for theming */
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.6;
-}
-
-* {
-  border-color: var(--border);
 }
 
 /* Tiptap Editor Styles */
@@ -74,7 +11,7 @@ body {
   outline: none;
   padding: 1rem;
   min-height: 200px;
-  border: 1px solid var(--border);
+  border: 1px solid rgb(226 232 240); /* neutral-200 for light mode, will be overridden by theme-aware components */
   border-radius: 0.5rem;
   font-family: inherit;
   line-height: 1.8;

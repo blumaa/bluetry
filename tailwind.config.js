@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-const mondTheme = require('@mond-design-system/theme');
+const { tokens } = require('@mond-design-system/theme');
 
 module.exports = {
   content: [
@@ -9,18 +9,39 @@ module.exports = {
   ],
   theme: {
     extend: {
-      ...mondTheme,
       colors: {
-        ...mondTheme.colors,
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
+        // Use design system tokens directly
+        ...tokens.colors,
+        
+        // Semantic color mappings for consistency with existing usage
+        // These will be handled by components using the design token hook
+        background: tokens.colors.background,
+        foreground: tokens.colors.foreground,
+        
+        // Add semantic UI colors that components expect
+        muted: {
+          DEFAULT: tokens.colors.neutral[100],
+          foreground: tokens.colors.neutral[500],
+        },
+        card: tokens.colors.background,
+        border: tokens.colors.neutral[200],
+        input: tokens.colors.neutral[100],
+        ring: tokens.colors.primary[500],
       },
       fontFamily: {
-        sans: ['var(--font-geist-sans)', ...mondTheme.fontFamily?.sans || []],
-        mono: ['var(--font-geist-mono)', ...mondTheme.fontFamily?.mono || []],
+        sans: [tokens.fontFamilies.sans],
+        serif: [tokens.fontFamilies.serif],
+        mono: [tokens.fontFamilies.mono],
       },
+      fontSize: tokens.fontSizes,
+      fontWeight: tokens.fontWeights,
+      lineHeight: tokens.lineHeights,
+      letterSpacing: tokens.letterSpacings,
+      spacing: tokens.spacing,
+      borderRadius: tokens.radii,
+      boxShadow: tokens.shadows,
     },
   },
   plugins: [],
-  darkMode: 'class',
+  darkMode: 'class', // Keep class-based dark mode for theme switching
 }

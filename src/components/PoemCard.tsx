@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Poem } from '@/types';
 import { Button } from '@mond-design-system/theme';
 import { formatRelativeTime, getPoemUrl } from '@/lib/utils';
@@ -16,6 +17,7 @@ interface PoemCardProps {
 
 export function PoemCard({ poem }: PoemCardProps) {
   const { theme } = useTheme();
+  const themeClasses = useThemeClasses();
   const { currentUser } = useAuth();
   const router = useRouter();
   const [isLiked, setIsLiked] = useState(false);
@@ -148,7 +150,7 @@ export function PoemCard({ poem }: PoemCardProps) {
 
   return (
     <article 
-      className="bg-card border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+      className={`${themeClasses.card} border ${themeClasses.border} rounded-lg hover:shadow-md transition-shadow cursor-pointer`}
       onClick={handleCardClick}
     >
       {/* Clickable padding wrapper */}
@@ -157,7 +159,7 @@ export function PoemCard({ poem }: PoemCardProps) {
       <div className="flex items-start justify-between mb-4">
         <div>
           <h2 
-            className="text-xl font-semibold text-foreground hover:text-primary transition-colors cursor-pointer"
+            className={`text-xl font-semibold ${themeClasses.foreground} hover:text-primary-500 transition-colors cursor-pointer`}
             onClick={(e) => {
               e.stopPropagation(); // Prevent card click
               handleNavigateToPoem();
@@ -165,10 +167,10 @@ export function PoemCard({ poem }: PoemCardProps) {
           >
             {poem.title}
           </h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className={`text-sm ${themeClasses.mutedForeground} mt-1`}>
             {formatRelativeTime(poem.createdAt)}
             {poem.pinned && (
-              <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/10 text-primary">
+              <span className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs ${themeClasses.conditional('bg-primary-100 text-primary-600', 'bg-primary-900/20 text-primary-400')}`}>
                 📌 Pinned
               </span>
             )}
@@ -179,13 +181,13 @@ export function PoemCard({ poem }: PoemCardProps) {
         {/* Poem Content */}
         <div className="mb-4 poem-content">
           <div 
-            className="leading-relaxed prose prose-lg max-w-none dark:prose-invert prose-p:my-2 prose-headings:my-2 [&_*]:!text-foreground"
+            className={`leading-relaxed prose prose-lg max-w-none prose-p:my-2 prose-headings:my-2 ${themeClasses.conditional('[&_*]:!text-[#414A4C]', '[&_*]:!text-[#DDE6ED]')}`}
             dangerouslySetInnerHTML={{ __html: displayContent }}
           />
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 pt-4 border-t">
+        <div className={`flex items-center gap-2 pt-4 border-t ${themeClasses.border}`}>
           <Button
             variant="ghost"
             size="sm"
@@ -196,7 +198,7 @@ export function PoemCard({ poem }: PoemCardProps) {
             }}
             disabled={isLiking || loadingLikeStatus}
             className={`flex items-center gap-2 px-3 py-1 ${
-              isLiked ? 'text-primary hover:bg-primary/10' : ''
+              isLiked ? `text-primary-500 ${themeClasses.conditional('hover:bg-primary-50', 'hover:bg-primary-900/20')}` : ''
             }`}
           >
             {loadingLikeStatus ? (

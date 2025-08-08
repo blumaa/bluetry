@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUI } from '@/contexts/UIContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
 import { Poem } from '@/types';
 import { formatRelativeTime, getPoemUrl } from '@/lib/utils';
@@ -17,6 +18,7 @@ interface PoemSidebarProps {
 export function PoemSidebar({ onPoemSelect }: PoemSidebarProps) {
   const { isSidebarOpen, closeSidebar, selectedPoemId, setSelectedPoemId, isMobile } = useUI();
   const { theme } = useTheme();
+  const themeClasses = useThemeClasses();
   const router = useRouter();
   const [poems, setPoems] = useState<Poem[]>([]);
   const [pinnedPoems, setPinnedPoems] = useState<Poem[]>([]);
@@ -54,10 +56,10 @@ export function PoemSidebar({ onPoemSelect }: PoemSidebarProps) {
   };
 
   const sidebarContent = (
-    <div className="h-full flex flex-col bg-background border-r border-border">
+    <div className={`h-full flex flex-col ${themeClasses.background} border-r ${themeClasses.border}`}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-border">
-        <h2 className="font-semibold text-foreground">Poems</h2>
+      <div className={`flex items-center justify-between p-4 ${themeClasses.border}`}>
+        <h2 className={`font-semibold ${themeClasses.foreground}`}>Poems</h2>
         <Button
           variant="ghost"
           size="sm"
@@ -75,7 +77,7 @@ export function PoemSidebar({ onPoemSelect }: PoemSidebarProps) {
         {/* Pinned Poems */}
         {pinnedPoems.length > 0 && (
           <div className="p-4">
-            <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+            <h3 className={`text-sm font-medium ${themeClasses.mutedForeground} mb-3 flex items-center gap-2`}>
               📌 Pinned Poems
             </h3>
             <div className="space-y-2">
@@ -93,7 +95,7 @@ export function PoemSidebar({ onPoemSelect }: PoemSidebarProps) {
 
         {/* Recent Poems */}
         <div className="p-4">
-          <h3 className="text-sm font-medium text-muted-foreground mb-3">
+          <h3 className={`text-sm font-medium ${themeClasses.mutedForeground} mb-3`}>
             {pinnedPoems.length > 0 ? 'Latest Poems' : 'All Poems'}
           </h3>
           <div className="space-y-2">
@@ -122,7 +124,7 @@ export function PoemSidebar({ onPoemSelect }: PoemSidebarProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={closeSidebar}
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
+              className={`fixed inset-0 ${themeClasses.background}/80 backdrop-blur-sm z-40 lg:hidden`}
             />
           )}
         </AnimatePresence>
@@ -169,16 +171,18 @@ interface PoemListItemProps {
 
 function PoemListItem({ poem, isSelected, onClick }: PoemListItemProps) {
   const { theme } = useTheme();
+  const themeClasses = useThemeClasses();
   
   return (
     <Button
+      alignContent='left'
       variant={isSelected ? "outline" : "ghost"}
       isDarkMode={theme === 'dark'}
       onClick={onClick}
       className={`w-full text-left p-3 h-auto justify-start ${
         isSelected
           ? 'bg-primary/10 text-primary border-primary/20'
-          : 'text-muted-foreground'
+          : themeClasses.mutedForeground
       }`}
     >
       <div className="space-y-1">
