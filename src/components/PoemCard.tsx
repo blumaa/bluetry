@@ -24,6 +24,7 @@ export function PoemCard({ poem }: PoemCardProps) {
   const [likeCount, setLikeCount] = useState(poem.likeCount);
   const [isLiking, setIsLiking] = useState(false);
   const [loadingLikeStatus, setLoadingLikeStatus] = useState(true);
+  const [showCopied, setShowCopied] = useState(false);
 
   useEffect(() => {
     const checkLikeStatus = async () => {
@@ -104,19 +105,12 @@ export function PoemCard({ poem }: PoemCardProps) {
 
   const handleShare = async () => {
     const url = `${window.location.origin}${getPoemUrl(poem)}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: poem.title,
-          url: url,
-        });
-      } catch {
-        // User cancelled or error occurred, fall back to clipboard
-        await navigator.clipboard.writeText(url);
-      }
-    } else {
-      // Fallback to clipboard
+    try {
       await navigator.clipboard.writeText(url);
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
     }
   };
 
@@ -233,7 +227,7 @@ export function PoemCard({ poem }: PoemCardProps) {
             className="flex items-center gap-2 px-3 py-1"
           >
             <span className="text-lg">🔗</span>
-            <span className="text-sm">Share</span>
+            <span className="text-sm">{showCopied ? 'Copied!' : 'Share'}</span>
           </Button>
         </div>
       </div>
