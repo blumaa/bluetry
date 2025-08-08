@@ -84,7 +84,7 @@ export default function PoemPage() {
       <div className="max-w-4xl mx-auto p-6">
         <div className="space-y-8">
           {/* Poem Display */}
-          <PoemCard poem={poem} showFullContent={true} />
+          <PoemCard poem={poem} />
 
           {/* Comments Section - Temporarily disabled until Firebase index is created */}
           {/* <CommentsSection poemId={poem.id} poemTitle={poem.title} /> */}

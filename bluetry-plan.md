@@ -74,3 +74,29 @@
   - pinned poems should not be on main page, only in side panel
   - clicking bluetry logo does not reset pagination to page one.. it should just go home.
   - what does the email subscribe do? it should say subscribed after sending email to list in be
+
+### more revisions
+- we need to build out an admin section called poem management, this should list all published poems with buttons to edit a poem, unpublish a poem, pin or unpin a poem, delete a poem (with confirmation dialog popup)
+- let's make the activity admin page the initial page when you log in. then we can remove the back to admin button from that page. and make sure we use the title of the poem with the activity when it is liked or used in an activity.
+- the formatting isn't being used in the body of a poemcard. right now I just see the html tags <p></p>
+
+### more revisions
+- make sure ALL buttons on website are from mond-design-system
+- when you click on content (text) of poemCard it should not be a link to individual poem card
+- okay, I need you to analyze the colors and the fonts in portfolio-2023, then, use the tokens in the mond-design-system within the bluetry app. you need to match the background of the light and dark scheme, the fonts, and colors between portfolio-2023 in the bluetry app.
+
+### Ice box ideas
+
+## user profiles
+## user following
+## user connection management
+## pinning others poems?
+## the wall/feed
+## the front page-- with all the most popular poems of the week and newest poems and trending poems-- three columns (maybe most commented on poems/controversial poems)
+## user report/blocking, comment report blocking
+## personal profile page with pic
+## hashtags and trending hashtags
+## categories of poems
+## saved poems
+## reposting poems with comments
+

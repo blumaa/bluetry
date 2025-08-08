@@ -179,15 +179,15 @@ export default function AdminPage() {
             <h2 className="text-xl font-semibold text-foreground mb-4">Recent Activity</h2>
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-primary rounded-full"></div>
                 <span className="text-muted-foreground">Total engagement: {totalComments} comments</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-primary rounded-full"></div>
                 <span className="text-muted-foreground">Most liked poem: "Diary of a Programmer 49"</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <div className="w-2 h-2 bg-primary/60 rounded-full"></div>
                 <span className="text-muted-foreground">Latest poem: "Thanks for Caring About Me"</span>
               </div>
             </div>
@@ -219,8 +219,8 @@ export default function AdminPage() {
                     {poem.pinned && <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">Pinned</span>}
                     <span className={`text-xs px-2 py-1 rounded ${
                       poem.published 
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' 
-                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                        ? 'bg-primary/10 text-primary' 
+                        : 'bg-muted text-muted-foreground'
                     }`}>
                       {poem.published ? 'Published' : 'Draft'}
                     </span>

@@ -6,6 +6,7 @@ import { PoemCard } from '@/components/PoemCard';
 import { EmailSignup } from '@/components/EmailSignup';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUI } from '@/contexts/UIContext';
+import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
 import { Poem } from '@/types';
 import { getPoems, listenToPoems } from '@/lib/firebaseService';
@@ -14,6 +15,7 @@ const POEMS_PER_PAGE = 5;
 
 export default function Home() {
   const { theme } = useTheme();
+  const themeClasses = useThemeClasses();
   const { currentPage, setCurrentPage } = useUI();
   const searchParams = useSearchParams();
   const [selectedPoem, setSelectedPoem] = useState<Poem | null>(null);
@@ -38,8 +40,8 @@ export default function Home() {
     // Set up real-time listener for poems
     const unsubscribe = listenToPoems((poems) => {
       // Filter out pinned poems from main feed
-      const filteredPoems = poems.filter(poem => !poem.pinned);
-      setAllPoems(filteredPoems);
+      const publishedPoems = poems.filter(poem => poem.published);
+      setAllPoems(publishedPoems);
       setLoading(false);
     });
 
@@ -75,6 +77,7 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  console.log('currentPoems', currentPoems);
   return (
     <div className="flex flex-1">
       <div className="flex-1 overflow-y-auto">
@@ -93,9 +96,9 @@ export default function Home() {
                   </Button>
                 </div>
                 <div className="text-center">
-                  <h1 className="text-2xl font-bold text-foreground mb-2">{selectedPoem.title}</h1>
+                  <h1 className={`text-2xl font-bold ${themeClasses.foreground} mb-2`}>{selectedPoem.title}</h1>
                 </div>
-                <PoemCard poem={selectedPoem} showFullContent={true} />
+                <PoemCard poem={selectedPoem} />
               </div>
             ) : (
               // Main poem feed with pagination
@@ -140,7 +143,7 @@ export default function Home() {
                   )}
 
                   {/* Page info */}
-                  <div className="text-center text-sm text-muted-foreground">
+                  <div className={`text-center text-sm ${themeClasses.mutedForeground}`}>
                     Showing {startIndex + 1}-
                     {Math.min(startIndex + POEMS_PER_PAGE, allPoems.length)} of {allPoems.length}{' '}
                     poems
@@ -151,7 +154,7 @@ export default function Home() {
                 {loading ? (
                   <div className="space-y-6">
                     {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="h-48 bg-muted animate-pulse rounded-lg" />
+                      <div key={i} className={`h-48 ${themeClasses.muted} animate-pulse rounded-lg`} />
                     ))}
                   </div>
                 ) : (
@@ -159,7 +162,7 @@ export default function Home() {
                     {/* Poems List */}
                     <div className="space-y-8">
                       {currentPoems.map((poem) => (
-                        <PoemCard key={poem.id} poem={poem} showFullContent={true} />
+                        <PoemCard key={poem.id} poem={poem} />
                       ))}
                     </div>
                   </>
@@ -170,7 +173,7 @@ export default function Home() {
       </div>
 
       {/* Right Sidebar - Only on larger screens */}
-      <aside className="hidden xl:block w-80 border-l border-border overflow-y-auto">
+      <aside className={`hidden xl:block w-80 border-l ${themeClasses.border} overflow-y-auto`}>
         <div className="p-6 space-y-6">
           <EmailSignup />
 

@@ -22,7 +22,7 @@ export function PoemList() {
 
         // Separate pinned and regular poems
         const pinnedPoemsData = allPoems.filter(poem => poem.pinned && poem.published);
-        const regularPoemsData = allPoems.filter(poem => !poem.pinned && poem.published);
+        const regularPoemsData = allPoems.filter(poem => poem.published);
 
         setPinnedPoems(pinnedPoemsData);
         setPoems(regularPoemsData);

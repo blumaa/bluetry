@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useUI } from '@/contexts/UIContext';
+import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
@@ -11,6 +12,7 @@ export function Header() {
   const { currentUser, loading, logout } = useAuth();
   const { theme } = useTheme();
   const { toggleSidebar, clearSelectedPoem, resetPagination } = useUI();
+  const themeClasses = useThemeClasses();
 
 
   const handleHomeClick = () => {
@@ -19,9 +21,9 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-14 items-center justify-between px-4">
-        <div className="flex items-center space-x-4">
+    <header className={`sticky top-0 z-50 w-full ${themeClasses.background}/95 backdrop-blur supports-[backdrop-filter]:${themeClasses.background}/60`}>
+      <div className={`flex h-14 items-center justify-between px-4 border ${themeClasses.border}`}>
+        <div className="flex items-center space-x-2">
           <Button
             variant="ghost"
             size="sm"
@@ -33,7 +35,7 @@ export function Header() {
             ☰
           </Button>
           <Link href="/" className="flex items-center space-x-2" onClick={handleHomeClick}>
-            <span className="text-2xl font-bold text-primary">bluetry</span>
+            <span className={`text-2xl font-bold ${themeClasses.foreground}`}>bluetry</span>
           </Link>
         </div>
 
@@ -64,7 +66,7 @@ export function Header() {
                     </>
                   )}
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-muted-foreground">
+                    <span className={`text-sm ${themeClasses.mutedForeground}`}>
                       {currentUser.displayName}
                     </span>
                     <Button variant="ghost" size="sm" isDarkMode={theme === 'dark'} onClick={logout}>

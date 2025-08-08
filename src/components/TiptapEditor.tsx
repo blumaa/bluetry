@@ -7,6 +7,7 @@ import Typography from '@tiptap/extension-typography';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Color } from '@tiptap/extension-color';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
 
 interface TiptapEditorProps {
@@ -17,38 +18,20 @@ interface TiptapEditorProps {
 
 export function TiptapEditor({ content, onChange, placeholder = 'Start writing your poem...' }: TiptapEditorProps) {
   const { theme } = useTheme();
+  const themeClasses = useThemeClasses();
 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         paragraph: {
           HTMLAttributes: {
-            class: 'my-2',
-          },
-          addAttributes() {
-            return {
-              style: {
-                default: null,
-                parseHTML: element => element.getAttribute('style'),
-                renderHTML: attributes => {
-                  if (!attributes.style) {
-                    return {};
-                  }
-                  return {
-                    style: attributes.style,
-                  };
-                },
-              },
-            };
+            class: 'my-0',
           },
         },
       }),
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
-      Typography,
       TextStyle,
       Color,
+      Typography,
     ],
     content,
     immediatelyRender: false,
@@ -66,13 +49,13 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
   });
 
   if (!editor) {
-    return <div className="h-[400px] bg-muted animate-pulse rounded-lg" />;
+    return <div className={`h-[400px] ${themeClasses.muted} animate-pulse rounded-lg`} />;
   }
 
   return (
-    <div className="border border-input rounded-lg overflow-hidden bg-background">
+    <div className={`border ${themeClasses.border} rounded-lg overflow-hidden ${themeClasses.background}`}>
       {/* Toolbar */}
-      <div className="flex items-center gap-2 p-3 border-b border-border bg-muted/30">
+      <div className={`flex items-center gap-2 p-3 border-b ${themeClasses.border} ${themeClasses.muted}/30`}>
         <div className="flex items-center gap-1">
           <Button
             type="button"
@@ -106,7 +89,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
           </Button>
         </div>
 
-        <div className="w-px h-6 bg-border" />
+        <div className={`w-px h-6 ${themeClasses.border}`} />
 
         <div className="flex items-center gap-1">
           <Button
@@ -138,7 +121,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
           </Button>
         </div>
 
-        <div className="w-px h-6 bg-border" />
+        <div className={`w-px h-6 ${themeClasses.border}`} />
 
         <div className="flex items-center gap-1">
           <Button
@@ -202,7 +185,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
           </Button>
         </div>
 
-        <div className="w-px h-6 bg-border" />
+        <div className={`w-px h-6 ${themeClasses.border}`} />
 
         <div className="flex items-center gap-1">
           <Button
@@ -230,10 +213,10 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
       <div className="relative">
         <EditorContent 
           editor={editor} 
-          className="prose prose-lg max-w-none [&_.ProseMirror]:min-h-[300px] [&_.ProseMirror]:p-4 [&_.ProseMirror]:outline-none [&_.ProseMirror]:font-serif [&_.ProseMirror]:leading-relaxed"
+          className="prose prose-lg max-w-none [&_.ProseMirror]:min-h-[300px] [&_.ProseMirror]:p-4 [&_.ProseMirror]:outline-none [&_.ProseMirror]:font-sans [&_.ProseMirror]:leading-relaxed"
         />
         {editor.isEmpty && (
-          <div className="absolute top-4 left-4 text-muted-foreground pointer-events-none">
+          <div className={`absolute top-4 left-4 ${themeClasses.mutedForeground} pointer-events-none`}>
             {placeholder}
           </div>
         )}

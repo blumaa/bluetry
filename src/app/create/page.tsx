@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
 import { TiptapEditor } from '@/components/TiptapEditor';
 import { createPoem, updatePoem, getPoemById } from '@/lib/firebaseService';
@@ -19,6 +20,7 @@ export default function CreatePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { theme } = useTheme();
+  const themeClasses = useThemeClasses();
   const { currentUser, loading } = useAuth();
   const [saving, setSaving] = useState(false);
   const [loadingPoem, setLoadingPoem] = useState(false);
@@ -172,14 +174,14 @@ export default function CreatePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen ${themeClasses.background}`}>
       <div className="max-w-4xl mx-auto p-6">
         {/* Notification */}
         {notification && (
           <div className={`mb-6 p-4 rounded-lg border ${
             notification.type === 'success' 
-              ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
-              : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
+              ? 'bg-primary/10 text-primary border-primary/20'
+              : `${themeClasses.muted} ${themeClasses.mutedForeground} border ${themeClasses.border}`
           }`}>
             {notification.message}
           </div>
@@ -189,10 +191,10 @@ export default function CreatePage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
+              <h1 className={`text-3xl font-bold ${themeClasses.foreground} mb-2`}>
                 {isEditMode ? 'Edit Poem' : 'Create New Poem'}
               </h1>
-              <p className="text-muted-foreground">
+              <p className={themeClasses.mutedForeground}>
                 {isEditMode ? 'Update your poem' : 'Write and publish your poetry'}
               </p>
             </div>
@@ -221,7 +223,7 @@ export default function CreatePage() {
           <div className="space-y-6">
             {/* Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-foreground mb-2">
+              <label htmlFor="title" className={`block text-sm font-medium ${themeClasses.foreground} mb-2`}>
                 Title *
               </label>
               <input
@@ -229,7 +231,7 @@ export default function CreatePage() {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-3 border border-input rounded-lg bg-background text-foreground text-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                className={`w-full px-4 py-3 border ${themeClasses.border} rounded-lg ${themeClasses.background} ${themeClasses.foreground} text-lg placeholder:${themeClasses.mutedForeground} focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
                 placeholder="Enter your poem title..."
                 disabled={saving}
                 required
@@ -238,7 +240,7 @@ export default function CreatePage() {
 
             {/* Content Editor */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className={`block text-sm font-medium ${themeClasses.foreground} mb-2`}>
                 Content *
               </label>
               <TiptapEditor
@@ -255,10 +257,10 @@ export default function CreatePage() {
                   type="checkbox"
                   checked={isPublished}
                   onChange={(e) => setIsPublished(e.target.checked)}
-                  className="w-4 h-4 text-primary bg-background border-input rounded focus:ring-ring focus:ring-2"
+                  className={`w-4 h-4 text-primary ${themeClasses.background} border ${themeClasses.border} rounded focus:ring-primary-500 focus:ring-2`}
                   disabled={saving}
                 />
-                <span className="text-sm font-medium text-foreground">
+                <span className={`text-sm font-medium ${themeClasses.foreground}`}>
                   Publish immediately
                 </span>
               </label>
@@ -268,11 +270,11 @@ export default function CreatePage() {
                   type="checkbox"
                   checked={isPinned}
                   onChange={(e) => setIsPinned(e.target.checked)}
-                  className="w-4 h-4 text-primary bg-background border-input rounded focus:ring-ring focus:ring-2"
+                  className={`w-4 h-4 text-primary ${themeClasses.background} border ${themeClasses.border} rounded focus:ring-primary-500 focus:ring-2`}
                   disabled={saving || !isPublished}
                 />
                 <span className={`text-sm font-medium ${
-                  isPublished ? 'text-foreground' : 'text-muted-foreground'
+                  isPublished ? themeClasses.foreground : themeClasses.mutedForeground
                 }`}>
                   Pin to top (only published poems can be pinned)
                 </span>
@@ -283,13 +285,13 @@ export default function CreatePage() {
           {/* Preview */}
           {content && (
             <div className="border-t pt-8">
-              <h3 className="text-lg font-semibold text-foreground mb-4">Preview</h3>
-              <div className="bg-card border rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-foreground mb-4">
+              <h3 className={`text-lg font-semibold ${themeClasses.foreground} mb-4`}>Preview</h3>
+              <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
+                <h2 className={`text-xl font-semibold ${themeClasses.foreground} mb-4`}>
                   {title || 'Untitled Poem'}
                 </h2>
                 <div 
-                  className="text-foreground whitespace-pre-wrap leading-relaxed font-serif prose prose-lg max-w-none"
+                  className={`${themeClasses.foreground} whitespace-pre-wrap leading-relaxed font-sans prose prose-lg max-w-none`}
                   dangerouslySetInnerHTML={{ __html: content }}
                 />
               </div>

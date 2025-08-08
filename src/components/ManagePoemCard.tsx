@@ -44,8 +44,8 @@ export function ManagePoemCard({
         <div className="flex items-center gap-2 ml-4">
           <span className={`px-2 py-1 text-xs rounded-full ${
             poem.published 
-              ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' 
-              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+              ? 'bg-primary/10 text-primary border border-primary/20' 
+              : 'bg-muted text-muted-foreground border border-border'
           }`}>
             {poem.published ? 'Published' : 'Draft'}
           </span>
@@ -107,7 +107,7 @@ export function ManagePoemCard({
           variant="ghost"
           size="sm"
           isDarkMode={theme === 'dark'}
-          className="px-3 py-1 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+          className="px-3 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-muted"
           onClick={() => onDelete(poem.id)}
           disabled={isDeleting}
         >

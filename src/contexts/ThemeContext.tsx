@@ -21,6 +21,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     
     const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
     setTheme(initialTheme);
+    // Keep the class-based dark mode for any remaining Tailwind utilities that might need it
     document.documentElement.classList.toggle('dark', initialTheme === 'dark');
   }, []);
 
@@ -28,6 +29,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
+    // Keep the class-based dark mode for any remaining Tailwind utilities that might need it
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
   };
 
