@@ -201,7 +201,7 @@ export default function PoemManagementPage() {
 
         {/* Delete Confirmation Dialog */}
         {confirmDeleteId && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-background border rounded-lg p-6 max-w-md w-full mx-4">
               <h3 className="text-lg font-semibold text-foreground mb-4">
                 Confirm Delete
@@ -220,7 +220,7 @@ export default function PoemManagementPage() {
                 <Button
                   variant="primary"
                   isDarkMode={theme === 'dark'}
-                  className="bg-red-600 hover:bg-red-700 text-white"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   onClick={() => handleDeletePoem(confirmDeleteId)}
                   disabled={deletingPoem === confirmDeleteId}
                 >

@@ -12,10 +12,9 @@ import { likePoem, unlikePoem, isPoemLikedByUser } from '@/lib/firebaseService';
 
 interface PoemCardProps {
   poem: Poem;
-  showFullContent?: boolean;
 }
 
-export function PoemCard({ poem, showFullContent = false }: PoemCardProps) {
+export function PoemCard({ poem }: PoemCardProps) {
   const { theme } = useTheme();
   const { currentUser } = useAuth();
   const router = useRouter();
@@ -119,33 +118,51 @@ export function PoemCard({ poem, showFullContent = false }: PoemCardProps) {
     }
   };
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Don't navigate if clicking on interactive elements
-    const target = e.target as HTMLElement;
-    if (
-      target.closest('button') || 
-      target.closest('a') || 
-      target.closest('[role="button"]')
-    ) {
-      return;
-    }
-    
+  const handleNavigateToPoem = () => {
+    console.log('handleNavigateToPoem called, navigating to:', getPoemUrl(poem));
     // Navigate to poem page
     router.push(getPoemUrl(poem));
   };
 
-  // Use full content or preview based on prop
-  const displayContent = showFullContent ? poem.content : poem.content;
+  const handleCardClick = (e: React.MouseEvent) => {
+    console.log('Card clicked!', e.target);
+    
+    // Don't navigate if clicking on interactive elements or poem content
+    const target = e.target as HTMLElement;
+    if (
+      target.closest('button') || 
+      target.closest('a') || 
+      target.closest('[role="button"]') ||
+      target.closest('.poem-content')
+    ) {
+      console.log('Clicked on interactive element, not navigating');
+      return;
+    }
+    
+    console.log('About to navigate to poem page');
+    // Navigate to poem page
+    handleNavigateToPoem();
+  };
+
+  const displayContent = poem.content;
 
   return (
     <article 
-      className="bg-card border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
+      className="bg-card border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
       onClick={handleCardClick}
     >
+      {/* Clickable padding wrapper */}
+      <div className="p-6">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h2 className="text-xl font-semibold text-foreground hover:text-primary transition-colors">
+          <h2 
+            className="text-xl font-semibold text-foreground hover:text-primary transition-colors cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent card click
+              handleNavigateToPoem();
+            }}
+          >
             {poem.title}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
@@ -159,47 +176,64 @@ export function PoemCard({ poem, showFullContent = false }: PoemCardProps) {
         </div>
       </div>
 
-      {/* Poem Content */}
-      <div className="mb-4">
-        <div 
-          className="text-foreground leading-relaxed prose prose-lg max-w-none dark:prose-invert prose-p:my-2 prose-headings:my-2"
-          dangerouslySetInnerHTML={{ __html: displayContent }}
-        />
-      </div>
+        {/* Poem Content */}
+        <div className="mb-4 poem-content">
+          <div 
+            className="leading-relaxed prose prose-lg max-w-none dark:prose-invert prose-p:my-2 prose-headings:my-2 [&_*]:!text-foreground"
+            dangerouslySetInnerHTML={{ __html: displayContent }}
+          />
+        </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-2 pt-4 border-t">
-        <button
-          onClick={handleLike}
-          disabled={isLiking || loadingLikeStatus}
-          className={`flex items-center gap-2 px-3 py-1 rounded-md transition-colors ${
-            isLiked 
-              ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20' 
-              : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-          }`}
-        >
-          {loadingLikeStatus ? (
-            <span className="text-lg animate-pulse">🤍</span>
-          ) : (
-            <span className="text-lg">{isLiked ? '❤️' : '🤍'}</span>
-          )}
-          <span className="text-sm">{likeCount}</span>
-        </button>
+        {/* Actions */}
+        <div className="flex items-center gap-2 pt-4 border-t">
+          <Button
+            variant="ghost"
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleLike();
+            }}
+            disabled={isLiking || loadingLikeStatus}
+            className={`flex items-center gap-2 px-3 py-1 ${
+              isLiked ? 'text-primary hover:bg-primary/10' : ''
+            }`}
+          >
+            {loadingLikeStatus ? (
+              <span className="text-lg animate-pulse">🤍</span>
+            ) : (
+              <span className="text-lg">{isLiked ? '❤️' : '🤍'}</span>
+            )}
+            <span className="text-sm">{likeCount}</span>
+          </Button>
 
-        <Link href={`${getPoemUrl(poem)}#comments`}>
-          <button className="flex items-center gap-2 px-3 py-1 rounded-md transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground">
-            <span className="text-lg">💬</span>
-            <span className="text-sm">{poem.commentCount}</span>
-          </button>
-        </Link>
+          <Link href={`${getPoemUrl(poem)}#comments`}>
+            <Button
+              variant="ghost"
+              size="sm"
+              isDarkMode={theme === 'dark'}
+              className="flex items-center gap-2 px-3 py-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="text-lg">💬</span>
+              <span className="text-sm">{poem.commentCount}</span>
+            </Button>
+          </Link>
 
-        <button
-          onClick={handleShare}
-          className="flex items-center gap-2 px-3 py-1 rounded-md transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-        >
-          <span className="text-lg">🔗</span>
-          <span className="text-sm">Share</span>
-        </button>
+          <Button
+            variant="ghost"
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleShare();
+            }}
+            className="flex items-center gap-2 px-3 py-1"
+          >
+            <span className="text-lg">🔗</span>
+            <span className="text-sm">Share</span>
+          </Button>
+        </div>
       </div>
     </article>
   );

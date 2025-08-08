@@ -20,8 +20,8 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-14 items-center justify-between px-4">
-        <div className="flex items-center space-x-4">
+      <div className="flex h-14 items-center justify-between px-4 border border-border">
+        <div className="flex items-center space-x-2">
           <Button
             variant="ghost"
             size="sm"
@@ -33,7 +33,7 @@ export function Header() {
             ☰
           </Button>
           <Link href="/" className="flex items-center space-x-2" onClick={handleHomeClick}>
-            <span className="text-2xl font-bold text-primary">bluetry</span>
+            <span className="text-2xl font-bold ">bluetry</span>
           </Link>
         </div>
 

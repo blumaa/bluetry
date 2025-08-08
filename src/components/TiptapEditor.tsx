@@ -23,32 +23,13 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
       StarterKit.configure({
         paragraph: {
           HTMLAttributes: {
-            class: 'my-2',
-          },
-          addAttributes() {
-            return {
-              style: {
-                default: null,
-                parseHTML: element => element.getAttribute('style'),
-                renderHTML: attributes => {
-                  if (!attributes.style) {
-                    return {};
-                  }
-                  return {
-                    style: attributes.style,
-                  };
-                },
-              },
-            };
+            class: 'my-0',
           },
         },
       }),
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
-      Typography,
       TextStyle,
       Color,
+      Typography,
     ],
     content,
     immediatelyRender: false,

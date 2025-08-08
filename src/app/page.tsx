@@ -38,8 +38,8 @@ export default function Home() {
     // Set up real-time listener for poems
     const unsubscribe = listenToPoems((poems) => {
       // Filter out pinned poems from main feed
-      const filteredPoems = poems.filter(poem => !poem.pinned);
-      setAllPoems(filteredPoems);
+      const publishedPoems = poems.filter(poem => poem.published);
+      setAllPoems(publishedPoems);
       setLoading(false);
     });
 
@@ -75,6 +75,7 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  console.log('currentPoems', currentPoems);
   return (
     <div className="flex flex-1">
       <div className="flex-1 overflow-y-auto">
@@ -95,7 +96,7 @@ export default function Home() {
                 <div className="text-center">
                   <h1 className="text-2xl font-bold text-foreground mb-2">{selectedPoem.title}</h1>
                 </div>
-                <PoemCard poem={selectedPoem} showFullContent={true} />
+                <PoemCard poem={selectedPoem} />
               </div>
             ) : (
               // Main poem feed with pagination
@@ -159,7 +160,7 @@ export default function Home() {
                     {/* Poems List */}
                     <div className="space-y-8">
                       {currentPoems.map((poem) => (
-                        <PoemCard key={poem.id} poem={poem} showFullContent={true} />
+                        <PoemCard key={poem.id} poem={poem} />
                       ))}
                     </div>
                   </>

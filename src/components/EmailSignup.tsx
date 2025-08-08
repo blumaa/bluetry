@@ -97,8 +97,8 @@ export function EmailSignup() {
         {message && (
           <div className={`text-sm p-3 rounded-md ${
             isSuccess 
-              ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800' 
-              : 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
+              ? 'bg-primary/10 text-primary border border-primary/20' 
+              : 'bg-muted text-muted-foreground border border-border'
           }`}>
             {message}
           </div>

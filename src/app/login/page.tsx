@@ -107,7 +107,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="bg-red-50 text-red-700 border border-red-200 rounded-md p-3 text-sm dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
+              <div className="bg-muted text-muted-foreground border border-border rounded-md p-3 text-sm">
                 {error}
               </div>
             )}
@@ -138,13 +138,15 @@ export default function LoginPage() {
 
           {/* Back to home */}
           <div className="mt-6 text-center">
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
+              isDarkMode={theme === 'dark'}
               onClick={() => router.push('/')}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm"
             >
               ← Back to poems
-            </button>
+            </Button>
           </div>
         </div>
       </div>

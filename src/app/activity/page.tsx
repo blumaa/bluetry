@@ -93,15 +93,15 @@ export default function ActivityPage() {
     switch (type) {
       case 'poem_created':
       case 'poem_published':
-        return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800';
+        return 'bg-primary/10 text-primary border-primary/20';
       case 'poem_liked':
-        return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
+        return 'bg-accent text-accent-foreground border-border';
       case 'comment_added':
-        return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
+        return 'bg-secondary text-secondary-foreground border-border';
       case 'subscriber_joined':
-        return 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800';
+        return 'bg-primary/5 text-primary border-primary/10';
       default:
-        return 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800';
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 
