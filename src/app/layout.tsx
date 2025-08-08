@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UIProvider } from '@/contexts/UIContext';
 import { Header } from '@/components/Header';
+import { PoemSidebar } from '@/components/PoemSidebar';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -36,9 +37,12 @@ export default function RootLayout({
             <UIProvider>
               <div className="min-h-screen bg-background">
                 <Header />
-                <main className="flex-1">
-                  {children}
-                </main>
+                <div className="flex h-[calc(100vh-3.5rem)]">
+                  <PoemSidebar />
+                  <main className="flex-1 overflow-y-auto">
+                    {children}
+                  </main>
+                </div>
               </div>
             </UIProvider>
           </AuthProvider>

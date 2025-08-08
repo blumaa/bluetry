@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@mond-design-system/theme';
 import { TiptapEditor } from '@/components/TiptapEditor';
-import { createPoem } from '@/lib/firebaseService';
+import { createPoem, updatePoem, getPoemById } from '@/lib/firebaseService';
 
 interface User {
   id: string;
@@ -17,13 +17,19 @@ interface User {
 
 export default function CreatePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { theme } = useTheme();
   const { currentUser, loading } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [loadingPoem, setLoadingPoem] = useState(false);
   const [notification, setNotification] = useState<{
     message: string;
     type: 'success' | 'error';
   } | null>(null);
+  
+  // Edit mode detection
+  const editPoemId = searchParams.get('edit');
+  const isEditMode = !!editPoemId;
   
   // Form state
   const [title, setTitle] = useState('');
@@ -37,16 +43,44 @@ export default function CreatePage() {
         router.push('/login');
       } else if (!currentUser.isAdmin) {
         router.push('/');
+      } else if (isEditMode && editPoemId) {
+        loadPoemForEditing(editPoemId);
       }
     }
-  }, [currentUser, loading, router]);
+  }, [currentUser, loading, router, isEditMode, editPoemId]);
+
+  const loadPoemForEditing = async (poemId: string) => {
+    try {
+      setLoadingPoem(true);
+      const poem = await getPoemById(poemId);
+      if (poem) {
+        setTitle(poem.title);
+        setContent(poem.content);
+        setIsPublished(poem.published);
+        setIsPinned(poem.pinned);
+      } else {
+        setNotification({
+          message: 'Poem not found',
+          type: 'error'
+        });
+      }
+    } catch (error) {
+      console.error('Error loading poem:', error);
+      setNotification({
+        message: 'Error loading poem for editing',
+        type: 'error'
+      });
+    } finally {
+      setLoadingPoem(false);
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!currentUser) {
       setNotification({
-        message: 'You must be logged in to create poems',
+        message: `You must be logged in to ${isEditMode ? 'edit' : 'create'} poems`,
         type: 'error'
       });
       return;
@@ -63,31 +97,44 @@ export default function CreatePage() {
     setSaving(true);
 
     try {
-      await createPoem({
-        title: title.trim(),
-        content: content,
-        authorId: currentUser.id,
-        published: isPublished,
-        pinned: isPinned,
-        likeCount: 0,
-        commentCount: 0,
-        viewCount: 0,
-      });
+      if (isEditMode && editPoemId) {
+        // Update existing poem
+        await updatePoem(editPoemId, {
+          title: title.trim(),
+          content: content,
+          published: isPublished,
+          pinned: isPinned,
+        });
+      } else {
+        // Create new poem
+        await createPoem({
+          title: title.trim(),
+          content: content,
+          authorId: currentUser.id,
+          published: isPublished,
+          pinned: isPinned,
+          likeCount: 0,
+          commentCount: 0,
+          viewCount: 0,
+        });
+      }
 
-      // Reset form
-      setTitle('');
-      setContent('');
-      setIsPublished(false);
-      setIsPinned(false);
+      if (!isEditMode) {
+        // Reset form only for new poems
+        setTitle('');
+        setContent('');
+        setIsPublished(false);
+        setIsPinned(false);
+      }
 
       setNotification({
-        message: 'Poem saved successfully!',
+        message: `Poem ${isEditMode ? 'updated' : 'saved'} successfully!`,
         type: 'success'
       });
       
       // Redirect after showing success message
       setTimeout(() => {
-        router.push('/');
+        router.push(isEditMode ? '/admin/poems' : '/');
       }, 1500);
     } catch (error) {
       console.error('Error saving poem:', error);
@@ -103,17 +150,19 @@ export default function CreatePage() {
   const handleCancel = () => {
     if (title || content) {
       if (confirm('Are you sure you want to discard your changes?')) {
-        router.push('/');
+        router.push(isEditMode ? '/admin/poems' : '/');
       }
     } else {
-      router.push('/');
+      router.push(isEditMode ? '/admin/poems' : '/');
     }
   };
 
-  if (loading) {
+  if (loading || loadingPoem) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse">Loading...</div>
+        <div className="animate-pulse">
+          {loadingPoem ? 'Loading poem...' : 'Loading...'}
+        </div>
       </div>
     );
   }
@@ -141,10 +190,10 @@ export default function CreatePage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">
-                Create New Poem
+                {isEditMode ? 'Edit Poem' : 'Create New Poem'}
               </h1>
               <p className="text-muted-foreground">
-                Write and publish your poetry
+                {isEditMode ? 'Update your poem' : 'Write and publish your poetry'}
               </p>
             </div>
             
@@ -161,9 +210,9 @@ export default function CreatePage() {
                 type="submit"
                 variant="primary"
                 isDarkMode={theme === 'dark'}
-                disabled={saving || !title.trim() || !content.trim()}
+                disabled={saving || loadingPoem || !title.trim() || !content.trim()}
               >
-                {saving ? 'Saving...' : 'Save Poem'}
+                {saving ? 'Saving...' : isEditMode ? 'Update Poem' : 'Save Poem'}
               </Button>
             </div>
           </div>

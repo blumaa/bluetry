@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { PoemSidebar } from '@/components/PoemSidebar';
 import { PoemCard } from '@/components/PoemCard';
 import { EmailSignup } from '@/components/EmailSignup';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -77,19 +76,12 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)]">
-      {' '}
-      {/* Account for header height */}
-      {/* Left Sidebar */}
-      <PoemSidebar onPoemSelect={handlePoemSelect} />
-      {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Main Poem Feed */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-4xl mx-auto p-6">
-            {selectedPoem ? (
-              // Individual poem view (when selected from sidebar)
-              <div className="space-y-8">
+    <div className="flex flex-1">
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-4xl mx-auto p-6">
+          {selectedPoem ? (
+            // Individual poem view (when selected from sidebar)
+            <div className="space-y-8">
                 <div className="flex items-center justify-between">
                   <Button
                     variant="ghost"
@@ -174,24 +166,23 @@ export default function Home() {
                 )}
               </div>
             )}
-          </div>
         </div>
-
-        {/* Right Sidebar - Only on larger screens */}
-        <aside className="hidden xl:block w-80 border-border overflow-y-auto">
-          <div className="p-6 space-y-6">
-            <EmailSignup />
-
-          {/*   <div className="bg-muted/50 rounded-lg p-6"> */}
-          {/*     <h3 className="font-semibold text-foreground mb-3">About bluetry</h3> */}
-          {/*     <p className="text-sm text-muted-foreground"> */}
-          {/*       Discover beautiful poetry and share your own verses with a community that */}
-          {/*       appreciates the art of words. */}
-          {/*     </p> */}
-          {/*   </div> */}
-          </div>
-        </aside>
       </div>
+
+      {/* Right Sidebar - Only on larger screens */}
+      <aside className="hidden xl:block w-80 border-l border-border overflow-y-auto">
+        <div className="p-6 space-y-6">
+          <EmailSignup />
+
+        {/*   <div className="bg-muted/50 rounded-lg p-6"> */}
+        {/*     <h3 className="font-semibold text-foreground mb-3">About bluetry</h3> */}
+        {/*     <p className="text-sm text-muted-foreground"> */}
+        {/*       Discover beautiful poetry and share your own verses with a community that */}
+        {/*       appreciates the art of words. */}
+        {/*     </p> */}
+        {/*   </div> */}
+        </div>
+      </aside>
     </div>
   );
 }

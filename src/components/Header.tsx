@@ -12,6 +12,7 @@ export function Header() {
   const { theme } = useTheme();
   const { toggleSidebar, clearSelectedPoem, resetPagination } = useUI();
 
+
   const handleHomeClick = () => {
     clearSelectedPoem(); // Clear selected poem to show main feed
     resetPagination(); // Reset pagination to page 1
@@ -50,9 +51,9 @@ export function Header() {
                           New Poem
                         </Button>
                       </Link>
-                      <Link href="/drafts">
+                      <Link href="/admin/poems">
                         <Button variant="ghost" size="sm" isDarkMode={theme === 'dark'}>
-                          Drafts
+                          Manage Poems
                         </Button>
                       </Link>
                       <Link href="/activity">

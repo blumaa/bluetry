@@ -20,7 +20,29 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        paragraph: {
+          HTMLAttributes: {
+            class: 'my-2',
+          },
+          addAttributes() {
+            return {
+              style: {
+                default: null,
+                parseHTML: element => element.getAttribute('style'),
+                renderHTML: attributes => {
+                  if (!attributes.style) {
+                    return {};
+                  }
+                  return {
+                    style: attributes.style,
+                  };
+                },
+              },
+            };
+          },
+        },
+      }),
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
@@ -37,6 +59,9 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
       attributes: {
         class: 'prose prose-lg max-w-none focus:outline-none min-h-[300px] p-4',
       },
+    },
+    parseOptions: {
+      preserveWhitespace: 'full',
     },
   });
 
@@ -110,6 +135,70 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
             onClick={() => editor.chain().focus().setTextAlign('right').run()}
           >
             ➡️
+          </Button>
+        </div>
+
+        <div className="w-px h-6 bg-border" />
+
+        <div className="flex items-center gap-1">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            onClick={() => {
+              // Move cursor to the beginning of the line and insert spaces
+              const { state } = editor;
+              const { selection } = state;
+              const { $from } = selection;
+              
+              // Find the start of the current paragraph
+              const paragraphStart = $from.start();
+              
+              // Insert 4 spaces at the beginning of the paragraph
+              editor.chain()
+                .focus()
+                .setTextSelection(paragraphStart)
+                .insertContent('    ') // 4 regular spaces
+                .run();
+            }}
+            title="Increase Indent"
+          >
+            ⇥
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            onClick={() => {
+              // Remove spaces at the beginning of the current line
+              const { state } = editor;
+              const { selection } = state;
+              const { $from } = selection;
+              
+              // Find the start of the current paragraph
+              const paragraphStart = $from.start();
+              const paragraph = $from.node();
+              
+              if (paragraph.type.name === 'paragraph') {
+                const content = paragraph.textContent;
+                // Check if line starts with spaces
+                const leadingSpaces = content.match(/^(\s+)/);
+                if (leadingSpaces) {
+                  const spacesToRemove = Math.min(4, leadingSpaces[1].length);
+                  // Remove up to 4 leading spaces
+                  editor.chain()
+                    .focus()
+                    .setTextSelection({ from: paragraphStart, to: paragraphStart + spacesToRemove })
+                    .deleteSelection()
+                    .run();
+                }
+              }
+            }}
+            title="Decrease Indent"
+          >
+            ⇤
           </Button>
         </div>
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@mond-design-system/theme';
@@ -21,6 +22,7 @@ export default function ActivityPage() {
   const { theme } = useTheme();
   const { currentUser, loading } = useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [poems, setPoems] = useState<Array<{id: string; title: string}>>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [stats, setStats] = useState({
     totalPoems: 0,
@@ -46,16 +48,17 @@ export default function ActivityPage() {
       setLoadingData(true);
       
       // Load real activities from Firebase
-      const [activityData, poems, subscribers] = await Promise.all([
+      const [activityData, poemsData, subscribers] = await Promise.all([
         getActivity(100), // Get last 100 activities
         getPoems(false), // Get all poems (published and unpublished)
         getSubscribers()
       ]);
       
       setActivities(activityData);
+      setPoems(poemsData);
       
       // Calculate stats
-      const publishedPoems = poems.filter(poem => poem.published);
+      const publishedPoems = poemsData.filter(poem => poem.published);
       setStats({
         totalPoems: publishedPoems.length,
         totalLikes: publishedPoems.reduce((sum, poem) => sum + (poem.likeCount || 0), 0),
@@ -103,15 +106,27 @@ export default function ActivityPage() {
   };
 
   const getActivityDescription = (activity: Activity) => {
+    // Helper function to get poem title - try metadata first, then lookup by poemId
+    const getPoemTitle = () => {
+      if (activity.metadata?.title) {
+        return activity.metadata.title;
+      }
+      if (activity.poemId) {
+        const poem = poems.find(p => p.id === activity.poemId);
+        return poem?.title || 'Untitled';
+      }
+      return 'Untitled';
+    };
+
     switch (activity.type) {
       case 'poem_created':
-        return `New poem created: "${activity.metadata?.title || 'Untitled'}"`;
+        return `New poem created: "${getPoemTitle()}"`;
       case 'poem_published':
-        return `Poem published: "${activity.metadata?.title || 'Untitled'}"`;
+        return `Poem published: "${getPoemTitle()}"`;
       case 'poem_liked':
-        return `Poem received a like`;
+        return `Poem "${getPoemTitle()}" received a like`;
       case 'comment_added':
-        return `New comment added to a poem`;
+        return `New comment added to "${getPoemTitle()}"`;
       case 'subscriber_joined':
         return `New email subscriber: ${activity.metadata?.email || 'Someone'}`;
       default:
@@ -132,8 +147,7 @@ export default function ActivityPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -145,13 +159,14 @@ export default function ActivityPage() {
             </p>
           </div>
           
-          <Button
-            variant="outline"
-            isDarkMode={theme === 'dark'}
-            onClick={() => router.push('/admin')}
-          >
-            ← Back to Admin
-          </Button>
+          <Link href="/admin/poems">
+            <Button
+              variant="outline"
+              isDarkMode={theme === 'dark'}
+            >
+              Manage Poems →
+            </Button>
+          </Link>
         </div>
 
         {/* Activity Stats */}
@@ -235,7 +250,6 @@ export default function ActivityPage() {
             </div>
           )}
         </div>
-      </div>
     </div>
   );
 }

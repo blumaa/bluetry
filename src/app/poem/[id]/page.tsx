@@ -43,11 +43,11 @@ export default function PoemPage() {
   }, [params.id, currentUser]);
 
   const handleBackClick = () => {
-    // Check if there's a saved page to return to
-    const savedPage = localStorage.getItem('currentPage');
-    if (savedPage) {
-      router.push(`/?page=${savedPage}`);
+    // Use router.back() for more reliable navigation
+    if (window.history.length > 1) {
+      router.back();
     } else {
+      // Fallback to home if no history
       router.push('/');
     }
   };
@@ -72,7 +72,7 @@ export default function PoemPage() {
             The poem you're looking for doesn't exist or may have been removed.
           </p>
           <Button variant="primary" isDarkMode={theme === 'dark'} onClick={handleBackClick}>
-            ← Back to Poems
+            ←
           </Button>
         </div>
       </div>
@@ -97,7 +97,7 @@ export default function PoemPage() {
               onClick={handleBackClick}
               className="flex items-center gap-2"
             >
-              ← Return to All Poems
+              ←
             </Button>
           </div>
         </div>

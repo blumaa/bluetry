@@ -11,6 +11,7 @@ import { Button } from '@mond-design-system/theme';
 export default function LoginPage() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { currentUser, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +23,14 @@ export default function LoginPage() {
     localStorage.removeItem('user');
   }, []);
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!loading && currentUser) {
+      // Redirect admin users to activity, regular users to home
+      router.push(currentUser.isAdmin ? '/activity' : '/');
+    }
+  }, [currentUser, loading, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -29,8 +38,8 @@ export default function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // AuthContext will handle the user state and redirect
-      router.push('/');
+      // AuthContext will handle the user state and redirect via useEffect
+      // The redirect happens in the useEffect above based on user role
     } catch (error: any) {
       console.error('Login error:', error);
       

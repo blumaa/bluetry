@@ -127,7 +127,7 @@ export async function createPoem(poemData: Omit<PoemData, 'createdAt' | 'updated
     });
     
     // Log activity
-    await logActivity('poem_created', poemData.authorId, docRef.id);
+    await logActivity('poem_created', poemData.authorId, docRef.id, { title: poemData.title });
     
     return docRef.id;
   } catch (error) {
@@ -148,7 +148,7 @@ export async function updatePoem(id: string, updates: Partial<PoemData>): Promis
     if (updates.published === true) {
       const poemData = await getPoemById(id);
       if (poemData) {
-        await logActivity('poem_published', poemData.authorId, id);
+        await logActivity('poem_published', poemData.authorId, id, { title: poemData.title });
       }
     }
   } catch (error) {
@@ -240,8 +240,11 @@ export async function likePoem(userId: string, poemId: string): Promise<void> {
     
     await batch.commit();
     
-    // Log activity
-    await logActivity('poem_liked', userId, poemId);
+    // Log activity - get poem title for the activity
+    const poem = await getPoemById(poemId);
+    if (poem) {
+      await logActivity('poem_liked', userId, poemId, { title: poem.title });
+    }
   } catch (error) {
     console.error('Error liking poem:', error);
     throw error;
@@ -349,8 +352,11 @@ export async function addComment(commentData: Omit<CommentData, 'createdAt' | 'u
     
     await batch.commit();
     
-    // Log activity
-    await logActivity('comment_added', commentData.authorId, commentData.poemId);
+    // Log activity - get poem title for the activity
+    const poem = await getPoemById(commentData.poemId);
+    if (poem) {
+      await logActivity('comment_added', commentData.authorId, commentData.poemId, { title: poem.title });
+    }
     
     return commentRef.id;
   } catch (error) {

@@ -161,9 +161,10 @@ export function PoemCard({ poem, showFullContent = false }: PoemCardProps) {
 
       {/* Poem Content */}
       <div className="mb-4">
-        <div className="text-foreground whitespace-pre-wrap leading-relaxed ">
-          {displayContent}
-        </div>
+        <div 
+          className="text-foreground leading-relaxed prose prose-lg max-w-none dark:prose-invert prose-p:my-2 prose-headings:my-2"
+          dangerouslySetInnerHTML={{ __html: displayContent }}
+        />
       </div>
 
       {/* Actions */}

@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { getPinnedPoems, listenToPoems } from '@/lib/firebaseService';
 
 interface PoemSidebarProps {
-  onPoemSelect: (poem: Poem) => void;
+  onPoemSelect?: (poem: Poem) => void;
 }
 
 export function PoemSidebar({ onPoemSelect }: PoemSidebarProps) {
@@ -45,8 +45,13 @@ export function PoemSidebar({ onPoemSelect }: PoemSidebarProps) {
   }, []);
 
   const handlePoemClick = (poem: Poem) => {
-    // Navigate to poem page (same behavior as clicking poem cards)
-    router.push(getPoemUrl(poem));
+    // Call the callback if provided (for backward compatibility)
+    if (onPoemSelect) {
+      onPoemSelect(poem);
+    } else {
+      // Navigate to poem page (default behavior)
+      router.push(getPoemUrl(poem));
+    }
     
     // Close sidebar on mobile after selection
     if (isMobile) {

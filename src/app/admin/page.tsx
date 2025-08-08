@@ -145,6 +145,16 @@ export default function AdminPage() {
                 </Button>
               </Link>
               
+              <Link href="/admin/poems">
+                <Button 
+                  variant="outline" 
+                  isDarkMode={theme === 'dark'}
+                  className="w-full justify-start"
+                >
+                  📚 Manage Poems
+                </Button>
+              </Link>
+              
               <Button 
                 variant="outline" 
                 isDarkMode={theme === 'dark'}
