@@ -5,7 +5,7 @@ import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
-import { Button } from '@mond-design-system/theme';
+import { Button, Input } from '@mond-design-system/theme';
 
 export function EmailSignup() {
   const { theme } = useTheme();
@@ -74,14 +74,14 @@ export function EmailSignup() {
       
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <input
+          <Input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            className={`w-full px-3 py-2 border ${themeClasses.border} rounded-md ${themeClasses.background} ${themeClasses.foreground} placeholder:${themeClasses.mutedForeground} focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
             disabled={isSubscribing}
             required
+            isDarkMode={theme === 'dark'}
           />
         </div>
         

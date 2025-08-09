@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@mond-design-system/theme':
-        specifier: ^1.0.6
-        version: 1.0.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^1.0.7
+        version: 1.0.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tiptap/extension-color':
         specifier: ^3.0.9
         version: 3.0.9(@tiptap/extension-text-style@3.0.9(@tiptap/core@3.0.9(@tiptap/pm@3.0.9)))
@@ -861,8 +861,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@mond-design-system/theme@1.0.6':
-    resolution: {integrity: sha512-Ms5JPq3p+0hKeurb3s58msvr4d2qkOPmyjd0K5PP3keNivdb4bYxLVGZxjwwkdFYgfGfy67OBTJesTQxjj9l2Q==}
+  '@mond-design-system/theme@1.0.7':
+    resolution: {integrity: sha512-iHYiH6IKl0kz/M9SXb7lZ8oucxEkccAVH/Y8NEs73Mj6LMLna83P3UeN0QMwwuTT4gCdvBM2zYAKGP3VvMTK2A==}
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
@@ -4687,7 +4687,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
 
-  '@mond-design-system/theme@1.0.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@mond-design-system/theme@1.0.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)

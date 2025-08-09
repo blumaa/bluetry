@@ -7,7 +7,7 @@ import { auth } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
-import { Button } from '@mond-design-system/theme';
+import { Button, Input } from '@mond-design-system/theme';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -80,15 +80,15 @@ export default function LoginPage() {
               <label htmlFor="email" className={`block text-sm font-medium ${themeClasses.foreground} mb-2`}>
                 Email
               </label>
-              <input
+              <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`w-full px-3 py-2 border ${themeClasses.border} rounded-md ${themeClasses.background} ${themeClasses.foreground} placeholder:${themeClasses.mutedForeground} focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
                 placeholder="Enter your email"
                 disabled={isLoading}
                 required
+                isDarkMode={theme === 'dark'}
               />
             </div>
 
@@ -96,15 +96,15 @@ export default function LoginPage() {
               <label htmlFor="password" className={`block text-sm font-medium ${themeClasses.foreground} mb-2`}>
                 Password
               </label>
-              <input
+              <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full px-3 py-2 border ${themeClasses.border} rounded-md ${themeClasses.background} ${themeClasses.foreground} placeholder:${themeClasses.mutedForeground} focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
                 placeholder="Enter your password"
                 disabled={isLoading}
                 required
+                isDarkMode={theme === 'dark'}
               />
             </div>
 

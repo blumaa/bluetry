@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
-import { Button } from '@mond-design-system/theme';
+import { Button, Input } from '@mond-design-system/theme';
+import { PoemCard } from '@/components/PoemCard';
+import { Poem } from '@/types';
 import { TiptapEditor } from '@/components/TiptapEditor';
 import { createPoem, updatePoem, getPoemById } from '@/lib/firebaseService';
 
@@ -19,15 +21,16 @@ export default function CreatePage() {
   const { currentUser, loading } = useAuth();
   const [saving, setSaving] = useState(false);
   const [loadingPoem, setLoadingPoem] = useState(false);
+  const [selectedPoem, setSelectedPoem] = useState<Poem | null>(null);
   const [notification, setNotification] = useState<{
     message: string;
     type: 'success' | 'error';
   } | null>(null);
-  
+
   // Edit mode detection
   const editPoemId = searchParams.get('edit');
   const isEditMode = !!editPoemId;
-  
+
   // Form state
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -55,17 +58,29 @@ export default function CreatePage() {
         setContent(poem.content);
         setIsPublished(poem.published);
         setIsPinned(poem.pinned);
+        setSelectedPoem({
+          id: poemId,
+          title: poem.title,
+          content: poem.content,
+          authorId: poem.authorId,
+          published: poem.published,
+          pinned: poem.pinned,
+          likeCount: poem.likeCount || 0,
+          commentCount: poem.commentCount || 0,
+          createdAt: poem.createdAt,
+          updatedAt: poem.updatedAt,
+        });
       } else {
         setNotification({
           message: 'Poem not found',
-          type: 'error'
+          type: 'error',
         });
       }
     } catch (error) {
       console.error('Error loading poem:', error);
       setNotification({
         message: 'Error loading poem for editing',
-        type: 'error'
+        type: 'error',
       });
     } finally {
       setLoadingPoem(false);
@@ -74,19 +89,19 @@ export default function CreatePage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!currentUser) {
       setNotification({
         message: `You must be logged in to ${isEditMode ? 'edit' : 'create'} poems`,
-        type: 'error'
+        type: 'error',
       });
       return;
     }
-    
+
     if (!title.trim() || !content.trim()) {
       setNotification({
         message: 'Please fill in both title and content',
-        type: 'error'
+        type: 'error',
       });
       return;
     }
@@ -126,9 +141,9 @@ export default function CreatePage() {
 
       setNotification({
         message: `Poem ${isEditMode ? 'updated' : 'saved'} successfully!`,
-        type: 'success'
+        type: 'success',
       });
-      
+
       // Redirect after showing success message
       setTimeout(() => {
         router.push(isEditMode ? '/admin/poems' : '/');
@@ -137,7 +152,7 @@ export default function CreatePage() {
       console.error('Error saving poem:', error);
       setNotification({
         message: 'Error saving poem. Please try again.',
-        type: 'error'
+        type: 'error',
       });
     } finally {
       setSaving(false);
@@ -157,9 +172,7 @@ export default function CreatePage() {
   if (loading || loadingPoem) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse">
-          {loadingPoem ? 'Loading poem...' : 'Loading...'}
-        </div>
+        <div className="animate-pulse">{loadingPoem ? 'Loading poem...' : 'Loading...'}</div>
       </div>
     );
   }
@@ -173,15 +186,17 @@ export default function CreatePage() {
       <div className="max-w-4xl mx-auto p-6">
         {/* Notification */}
         {notification && (
-          <div className={`mb-6 p-4 rounded-lg border ${
-            notification.type === 'success' 
-              ? 'bg-primary/10 text-primary border-primary/20'
-              : `${themeClasses.muted} ${themeClasses.mutedForeground} border ${themeClasses.border}`
-          }`}>
+          <div
+            className={`mb-6 p-4 rounded-lg border ${
+              notification.type === 'success'
+                ? 'bg-primary/10 text-primary border-primary/20'
+                : `${themeClasses.muted} ${themeClasses.mutedForeground} border ${themeClasses.border}`
+            }`}
+          >
             {notification.message}
           </div>
         )}
-        
+
         <form onSubmit={handleSave} className="space-y-8">
           {/* Header */}
           <div className="flex items-center justify-between">
@@ -193,7 +208,7 @@ export default function CreatePage() {
                 {isEditMode ? 'Update your poem' : 'Write and publish your poetry'}
               </p>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <Button
                 type="button"
@@ -218,18 +233,22 @@ export default function CreatePage() {
           <div className="space-y-6">
             {/* Title */}
             <div>
-              <label htmlFor="title" className={`block text-sm font-medium ${themeClasses.foreground} mb-2`}>
+              <label
+                htmlFor="title"
+                className={`block text-sm font-medium ${themeClasses.foreground} mb-2`}
+              >
                 Title *
               </label>
-              <input
+              <Input
                 id="title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className={`w-full px-4 py-3 border ${themeClasses.border} rounded-lg ${themeClasses.background} ${themeClasses.foreground} text-lg placeholder:${themeClasses.mutedForeground} focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
                 placeholder="Enter your poem title..."
                 disabled={saving}
                 required
+                isDarkMode={theme === 'dark'}
+                className="text-lg"
               />
             </div>
 
@@ -248,12 +267,13 @@ export default function CreatePage() {
             {/* Options */}
             <div className="flex flex-wrap gap-6">
               <label className="flex items-center gap-3 cursor-pointer">
-                <input
+                <Input
                   type="checkbox"
                   checked={isPublished}
                   onChange={(e) => setIsPublished(e.target.checked)}
-                  className={`w-4 h-4 text-primary ${themeClasses.background} border ${themeClasses.border} rounded focus:ring-primary-500 focus:ring-2`}
                   disabled={saving}
+                  isDarkMode={theme === 'dark'}
+                  className="w-4 h-4"
                 />
                 <span className={`text-sm font-medium ${themeClasses.foreground}`}>
                   Publish immediately
@@ -261,16 +281,19 @@ export default function CreatePage() {
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer">
-                <input
+                <Input
                   type="checkbox"
                   checked={isPinned}
                   onChange={(e) => setIsPinned(e.target.checked)}
-                  className={`w-4 h-4 text-primary ${themeClasses.background} border ${themeClasses.border} rounded focus:ring-primary-500 focus:ring-2`}
                   disabled={saving || !isPublished}
+                  isDarkMode={theme === 'dark'}
+                  className="w-4 h-4"
                 />
-                <span className={`text-sm font-medium ${
-                  isPublished ? themeClasses.foreground : themeClasses.mutedForeground
-                }`}>
+                <span
+                  className={`text-sm font-medium ${
+                    isPublished ? themeClasses.foreground : themeClasses.mutedForeground
+                  }`}
+                >
                   Pin to top (only published poems can be pinned)
                 </span>
               </label>
@@ -278,18 +301,11 @@ export default function CreatePage() {
           </div>
 
           {/* Preview */}
+
           {content && (
             <div className="border-t pt-8">
               <h3 className={`text-lg font-semibold ${themeClasses.foreground} mb-4`}>Preview</h3>
-              <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
-                <h2 className={`text-xl font-semibold ${themeClasses.foreground} mb-4`}>
-                  {title || 'Untitled Poem'}
-                </h2>
-                <div 
-                  className={`${themeClasses.foreground} whitespace-pre-wrap leading-relaxed font-sans prose prose-lg max-w-none`}
-                  dangerouslySetInnerHTML={{ __html: content }}
-                />
-              </div>
+              {selectedPoem && <PoemCard poem={{...selectedPoem, content, title}} />}
             </div>
           )}
         </form>

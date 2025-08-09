@@ -75,7 +75,6 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  console.log('currentPoems', currentPoems);
   return (
     <div className="flex flex-1">
       <div className="flex-1 overflow-y-auto">
