@@ -5,21 +5,18 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
 import { formatRelativeTime } from '@/lib/utils';
 import { getActivity, getPoems, getSubscribers, type Activity } from '@/lib/firebaseService';
 
-interface User {
-  id: string;
-  email: string;
-  displayName: string;
-  isAdmin: boolean;
-}
+// Removed unused User interface
 
 
 export default function ActivityPage() {
   const router = useRouter();
   const { theme } = useTheme();
+  const themeClasses = useThemeClasses();
   const { currentUser, loading } = useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [poems, setPoems] = useState<Array<{id: string; title: string}>>([]);
@@ -89,21 +86,7 @@ export default function ActivityPage() {
     }
   };
 
-  const getActivityColor = (type: Activity['type']) => {
-    switch (type) {
-      case 'poem_created':
-      case 'poem_published':
-        return 'bg-primary/10 text-primary border-primary/20';
-      case 'poem_liked':
-        return 'bg-accent text-accent-foreground border-border';
-      case 'comment_added':
-        return 'bg-secondary text-secondary-foreground border-border';
-      case 'subscriber_joined':
-        return 'bg-primary/5 text-primary border-primary/10';
-      default:
-        return 'bg-muted text-muted-foreground border-border';
-    }
-  };
+  // Removed getActivityColor function - now using consistent primary Button styling
 
   const getActivityDescription = (activity: Activity) => {
     // Helper function to get poem title - try metadata first, then lookup by poemId
@@ -151,10 +134,10 @@ export default function ActivityPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className={`text-3xl font-bold ${themeClasses.foreground} mb-2`}>
               Activity
             </h1>
-            <p className="text-muted-foreground">
+            <p className={themeClasses.mutedForeground}>
               Recent activity and engagement on your poetry platform
             </p>
           </div>
@@ -171,52 +154,52 @@ export default function ActivityPage() {
 
         {/* Activity Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-card border rounded-lg p-4">
-            <div className="text-2xl font-bold text-foreground">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}>
+            <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
               {loadingData ? '...' : stats.totalPoems}
             </div>
-            <div className="text-sm text-muted-foreground">Published Poems</div>
+            <div className={`text-sm ${themeClasses.mutedForeground}`}>Published Poems</div>
           </div>
           
-          <div className="bg-card border rounded-lg p-4">
-            <div className="text-2xl font-bold text-foreground">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}>
+            <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
               {loadingData ? '...' : stats.totalLikes}
             </div>
-            <div className="text-sm text-muted-foreground">Total Likes</div>
+            <div className={`text-sm ${themeClasses.mutedForeground}`}>Total Likes</div>
           </div>
           
-          <div className="bg-card border rounded-lg p-4">
-            <div className="text-2xl font-bold text-foreground">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}>
+            <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
               {loadingData ? '...' : stats.totalComments}
             </div>
-            <div className="text-sm text-muted-foreground">Total Comments</div>
+            <div className={`text-sm ${themeClasses.mutedForeground}`}>Total Comments</div>
           </div>
           
-          <div className="bg-card border rounded-lg p-4">
-            <div className="text-2xl font-bold text-foreground">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}>
+            <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
               {loadingData ? '...' : stats.totalSubscribers}
             </div>
-            <div className="text-sm text-muted-foreground">Email Subscribers</div>
+            <div className={`text-sm ${themeClasses.mutedForeground}`}>Email Subscribers</div>
           </div>
         </div>
 
         {/* Activity Feed */}
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-foreground mb-4">Recent Activity</h2>
+          <h2 className={`text-xl font-semibold ${themeClasses.foreground} mb-4`}>Recent Activity</h2>
           
           {loadingData ? (
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
+                <div key={i} className={`h-20 ${themeClasses.muted} animate-pulse rounded-lg`} />
               ))}
             </div>
           ) : activities.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📊</div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
+              <h3 className={`text-xl font-semibold ${themeClasses.foreground} mb-2`}>
                 No activity yet
               </h3>
-              <p className="text-muted-foreground">
+              <p className={themeClasses.mutedForeground}>
                 Activity will appear here as people interact with your poems.
               </p>
             </div>
@@ -225,7 +208,7 @@ export default function ActivityPage() {
               {activities.slice(0, 50).map((activity) => (
                 <div
                   key={activity.id}
-                  className="flex items-start gap-4 p-4 bg-card border rounded-lg hover:shadow-sm transition-shadow"
+                  className={`flex items-start gap-4 p-4 ${themeClasses.card} border ${themeClasses.border} rounded-lg hover:shadow-sm transition-shadow`}
                 >
                   <div className="flex-shrink-0 text-2xl">
                     {getActivityIcon(activity.type)}
@@ -233,18 +216,24 @@ export default function ActivityPage() {
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-medium text-foreground">
+                      <h3 className={`text-sm font-medium ${themeClasses.foreground}`}>
                         {getActivityDescription(activity)}
                       </h3>
-                      <span className="text-xs text-muted-foreground">
+                      <span className={`text-xs ${themeClasses.mutedForeground}`}>
                         {formatRelativeTime(activity.timestamp)}
                       </span>
                     </div>
                   </div>
                   
-                  <div className={`px-2 py-1 rounded-full text-xs border ${getActivityColor(activity.type)}`}>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    corners="rounded"
+                    isDarkMode={theme === 'dark'}
+                    className="px-2 py-1 text-xs pointer-events-none"
+                  >
                     {activity.type.replace('_', ' ')}
-                  </div>
+                  </Button>
                 </div>
               ))}
             </div>

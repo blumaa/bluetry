@@ -7,7 +7,6 @@ import { Button } from '@mond-design-system/theme';
 import { formatRelativeTime } from '@/lib/utils';
 import { 
   addComment, 
-  getComments, 
   listenToComments, 
   type Comment 
 } from '@/lib/firebaseService';

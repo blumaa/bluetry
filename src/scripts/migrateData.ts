@@ -2,7 +2,7 @@
 // Usage: npx ts-node src/scripts/migrateData.ts
 
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import mockPoemsData from '../data/mock-poems.json';
 
 const firebaseConfig = {

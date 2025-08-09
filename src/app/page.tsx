@@ -9,7 +9,7 @@ import { useUI } from '@/contexts/UIContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
 import { Poem } from '@/types';
-import { getPoems, listenToPoems } from '@/lib/firebaseService';
+import { listenToPoems } from '@/lib/firebaseService';
 
 const POEMS_PER_PAGE = 5;
 
@@ -49,9 +49,7 @@ export default function Home() {
     return () => unsubscribe();
   }, []);
 
-  const handlePoemSelect = (poem: Poem) => {
-    setSelectedPoem(poem);
-  };
+  // Removed unused handlePoemSelect function
 
   // Pagination logic
   const totalPages = Math.ceil(allPoems.length / POEMS_PER_PAGE);

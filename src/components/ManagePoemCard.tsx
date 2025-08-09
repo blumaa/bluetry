@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+// Removed unused useState import
 import Link from 'next/link';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
 import { formatRelativeTime, getPoemUrl } from '@/lib/utils';
 import { Poem } from '@/types';
@@ -25,40 +26,49 @@ export function ManagePoemCard({
   isDeleting 
 }: ManagePoemCardProps) {
   const { theme } = useTheme();
+  const themeClasses = useThemeClasses();
 
   return (
-    <div className="bg-card border rounded-lg p-6 hover:shadow-sm transition-shadow">
+    <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6 hover:shadow-sm transition-shadow`}>
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
           <Link href={getPoemUrl(poem)} className="group">
-            <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors cursor-pointer">
+            <h3 className={`text-lg font-semibold ${themeClasses.foreground} group-hover:text-primary transition-colors cursor-pointer`}>
               {poem.title}
             </h3>
           </Link>
-          <p className="text-sm text-muted-foreground mt-1 truncate">
+          <p className={`text-sm ${themeClasses.mutedForeground} mt-1 truncate`}>
             {poem.content.replace(/<[^>]*>/g, '').substring(0, 100)}...
           </p>
         </div>
         
         <div className="flex items-center gap-2 ml-4">
-          <span className={`px-2 py-1 text-xs rounded-full ${
-            poem.published 
-              ? 'bg-primary/10 text-primary border border-primary/20' 
-              : 'bg-muted text-muted-foreground border border-border'
-          }`}>
+          <Button
+            variant={poem.published ? "primary" : "ghost"}
+            size="sm"
+            corners="rounded"
+            isDarkMode={theme === 'dark'}
+            className="px-2 py-1 text-xs pointer-events-none"
+          >
             {poem.published ? 'Published' : 'Draft'}
-          </span>
+          </Button>
           {poem.pinned && (
-            <span className="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
+            <Button
+              variant="primary"
+              size="sm"
+              corners="rounded"
+              isDarkMode={theme === 'dark'}
+              className="px-2 py-1 text-xs pointer-events-none"
+            >
               📌 Pinned
-            </span>
+            </Button>
           )}
         </div>
       </div>
 
       {/* Stats */}
-      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+      <div className={`flex items-center gap-4 text-sm ${themeClasses.mutedForeground} mb-4`}>
         <span>Created {formatRelativeTime(poem.createdAt)}</span>
         <span>•</span>
         <span>{poem.likeCount || 0} likes</span>
@@ -107,7 +117,7 @@ export function ManagePoemCard({
           variant="ghost"
           size="sm"
           isDarkMode={theme === 'dark'}
-          className="px-3 py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-muted"
+          className={`px-3 py-1 text-sm ${themeClasses.mutedForeground} hover:${themeClasses.foreground} hover:${themeClasses.muted}`}
           onClick={() => onDelete(poem.id)}
           disabled={isDeleting}
         >

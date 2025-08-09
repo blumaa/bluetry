@@ -9,14 +9,14 @@ import { Button } from '@mond-design-system/theme';
 import { Poem } from '@/types';
 import { formatRelativeTime, getPoemUrl } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-import { getPinnedPoems, listenToPoems } from '@/lib/firebaseService';
+import { listenToPoems } from '@/lib/firebaseService';
 
 interface PoemSidebarProps {
   onPoemSelect?: (poem: Poem) => void;
 }
 
 export function PoemSidebar({ onPoemSelect }: PoemSidebarProps) {
-  const { isSidebarOpen, closeSidebar, selectedPoemId, setSelectedPoemId, isMobile } = useUI();
+  const { isSidebarOpen, closeSidebar, selectedPoemId, isMobile } = useUI();
   const { theme } = useTheme();
   const themeClasses = useThemeClasses();
   const router = useRouter();

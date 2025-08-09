@@ -14,9 +14,6 @@ import {
   serverTimestamp,
   onSnapshot,
   writeBatch,
-  type DocumentData,
-  type Query,
-  type QuerySnapshot,
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from './firebase';
@@ -51,7 +48,7 @@ export async function getPoems(publishedOnly: boolean = true): Promise<Poem[]> {
     }
     
     const querySnapshot = await getDocs(q);
-    let poems = querySnapshot.docs.map(doc => ({
+    const poems = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate() || new Date(),
@@ -77,7 +74,7 @@ export async function getPinnedPoems(): Promise<Poem[]> {
     );
     
     const querySnapshot = await getDocs(q);
-    let poems = querySnapshot.docs.map(doc => ({
+    const allPoems = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate() || new Date(),
@@ -85,7 +82,7 @@ export async function getPinnedPoems(): Promise<Poem[]> {
     })) as Poem[];
     
     // Filter for pinned poems and sort in memory
-    poems = poems
+    const poems = allPoems
       .filter(poem => poem.pinned === true)
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     
@@ -541,7 +538,7 @@ export function listenToPoems(callback: (poems: Poem[]) => void, publishedOnly: 
   }
   
   return onSnapshot(q, (querySnapshot) => {
-    let poems = querySnapshot.docs.map(doc => ({
+    const poems = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate() || new Date(),

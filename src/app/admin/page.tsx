@@ -4,20 +4,17 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
 import mockPoemsData from '@/data/mock-poems.json';
 
-interface User {
-  id: string;
-  email: string;
-  displayName: string;
-  isAdmin: boolean;
-}
+// Removed unused User interface - using inline type
 
 export default function AdminPage() {
   const router = useRouter();
   const { theme } = useTheme();
-  const [user, setUser] = useState<User | null>(null);
+  const themeClasses = useThemeClasses();
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -58,15 +55,15 @@ export default function AdminPage() {
   const totalComments = mockPoemsData.reduce((sum, p) => sum + p.commentCount, 0);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen ${themeClasses.background}`}>
       <div className="max-w-6xl mx-auto p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className={`text-3xl font-bold ${themeClasses.foreground} mb-2`}>
               Admin Dashboard
             </h1>
-            <p className="text-muted-foreground">
+            <p className={themeClasses.mutedForeground}>
               Welcome back, {user.displayName}
             </p>
           </div>
@@ -89,41 +86,41 @@ export default function AdminPage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-card border rounded-lg p-6">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Poems</p>
-                <p className="text-2xl font-bold text-foreground">{totalPoems}</p>
+                <p className={`text-sm font-medium ${themeClasses.mutedForeground}`}>Total Poems</p>
+                <p className={`text-2xl font-bold ${themeClasses.foreground}`}>{totalPoems}</p>
               </div>
               <div className="text-2xl">📝</div>
             </div>
           </div>
 
-          <div className="bg-card border rounded-lg p-6">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Published</p>
-                <p className="text-2xl font-bold text-foreground">{publishedPoems}</p>
+                <p className={`text-sm font-medium ${themeClasses.mutedForeground}`}>Published</p>
+                <p className={`text-2xl font-bold ${themeClasses.foreground}`}>{publishedPoems}</p>
               </div>
               <div className="text-2xl">📖</div>
             </div>
           </div>
 
-          <div className="bg-card border rounded-lg p-6">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Pinned</p>
-                <p className="text-2xl font-bold text-foreground">{pinnedPoems}</p>
+                <p className={`text-sm font-medium ${themeClasses.mutedForeground}`}>Pinned</p>
+                <p className={`text-2xl font-bold ${themeClasses.foreground}`}>{pinnedPoems}</p>
               </div>
               <div className="text-2xl">📌</div>
             </div>
           </div>
 
-          <div className="bg-card border rounded-lg p-6">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Likes</p>
-                <p className="text-2xl font-bold text-foreground">{totalLikes}</p>
+                <p className={`text-sm font-medium ${themeClasses.mutedForeground}`}>Total Likes</p>
+                <p className={`text-2xl font-bold ${themeClasses.foreground}`}>{totalLikes}</p>
               </div>
               <div className="text-2xl">❤️</div>
             </div>
@@ -132,8 +129,8 @@ export default function AdminPage() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-card border rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-foreground mb-4">Quick Actions</h2>
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
+            <h2 className={`text-xl font-semibold ${themeClasses.foreground} mb-4`}>Quick Actions</h2>
             <div className="space-y-4">
               <Link href="/create">
                 <Button 
@@ -175,20 +172,20 @@ export default function AdminPage() {
             </div>
           </div>
 
-          <div className="bg-card border rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-foreground mb-4">Recent Activity</h2>
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
+            <h2 className={`text-xl font-semibold ${themeClasses.foreground} mb-4`}>Recent Activity</h2>
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-sm">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-muted-foreground">Total engagement: {totalComments} comments</span>
+                <span className={themeClasses.mutedForeground}>Total engagement: {totalComments} comments</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className="text-muted-foreground">Most liked poem: "Diary of a Programmer 49"</span>
+                <span className={themeClasses.mutedForeground}>Most liked poem: "Diary of a Programmer 49"</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <div className="w-2 h-2 bg-primary/60 rounded-full"></div>
-                <span className="text-muted-foreground">Latest poem: "Thanks for Caring About Me"</span>
+                <span className={themeClasses.mutedForeground}>Latest poem: "Thanks for Caring About Me"</span>
               </div>
             </div>
           </div>
@@ -197,7 +194,7 @@ export default function AdminPage() {
         {/* Recent Poems Preview */}
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-foreground">Recent Poems</h2>
+            <h2 className={`text-xl font-semibold ${themeClasses.foreground}`}>Recent Poems</h2>
             <Link href="/">
               <Button variant="ghost" isDarkMode={theme === 'dark'}>
                 View All →
@@ -205,13 +202,13 @@ export default function AdminPage() {
             </Link>
           </div>
           
-          <div className="bg-card border rounded-lg p-6">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
             <div className="space-y-4">
               {mockPoemsData.slice(0, 5).map((poem) => (
-                <div key={poem.id} className="flex items-center justify-between py-2 border-b border-border last:border-b-0">
+                <div key={poem.id} className={`flex items-center justify-between py-2 border-b ${themeClasses.border} last:border-b-0`}>
                   <div>
-                    <h3 className="font-medium text-foreground">{poem.title}</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className={`font-medium ${themeClasses.foreground}`}>{poem.title}</h3>
+                    <p className={`text-sm ${themeClasses.mutedForeground}`}>
                       {new Date(poem.createdAt).toLocaleDateString()} • {poem.likeCount} likes • {poem.commentCount} comments
                     </p>
                   </div>
@@ -220,7 +217,7 @@ export default function AdminPage() {
                     <span className={`text-xs px-2 py-1 rounded ${
                       poem.published 
                         ? 'bg-primary/10 text-primary' 
-                        : 'bg-muted text-muted-foreground'
+                        : `${themeClasses.muted} ${themeClasses.mutedForeground}`
                     }`}>
                       {poem.published ? 'Published' : 'Draft'}
                     </span>

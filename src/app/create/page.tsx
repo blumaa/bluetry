@@ -9,12 +9,7 @@ import { Button } from '@mond-design-system/theme';
 import { TiptapEditor } from '@/components/TiptapEditor';
 import { createPoem, updatePoem, getPoemById } from '@/lib/firebaseService';
 
-interface User {
-  id: string;
-  email: string;
-  displayName: string;
-  isAdmin: boolean;
-}
+// Removed unused User interface
 
 export default function CreatePage() {
   const router = useRouter();

@@ -14,7 +14,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@mond-design-system/theme": "^1.0.5",
+    "@mond-design-system/theme": "^1.0.6",
     "@tiptap/extension-color": "^3.0.9",
     "@tiptap/extension-text-align": "^3.0.9",
     "@tiptap/extension-text-style": "^3.0.9",

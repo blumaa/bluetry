@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setCurrentUser(user);
           setLoading(false);
           return true;
-        } catch (error) {
+        } catch {
           localStorage.removeItem('isAuthenticated');
           localStorage.removeItem('user');
         }

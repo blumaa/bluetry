@@ -29,6 +29,9 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
           },
         },
       }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
       TextStyle,
       Color,
       Typography,
@@ -213,7 +216,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
       <div className="relative">
         <EditorContent 
           editor={editor} 
-          className="prose prose-lg max-w-none [&_.ProseMirror]:min-h-[300px] [&_.ProseMirror]:p-4 [&_.ProseMirror]:outline-none [&_.ProseMirror]:font-sans [&_.ProseMirror]:leading-relaxed"
+          className={`prose prose-lg max-w-none [&_.ProseMirror]:min-h-[300px] [&_.ProseMirror]:p-4 [&_.ProseMirror]:outline-none [&_.ProseMirror]:font-sans [&_.ProseMirror]:leading-relaxed ${themeClasses.conditional('[&_.ProseMirror]:text-[#414A4C]', '[&_.ProseMirror]:text-[#DDE6ED]')}`}
         />
         {editor.isEmpty && (
           <div className={`absolute top-4 left-4 ${themeClasses.mutedForeground} pointer-events-none`}>

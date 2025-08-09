@@ -6,11 +6,13 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
 
 export default function LoginPage() {
   const router = useRouter();
   const { theme } = useTheme();
+  const themeClasses = useThemeClasses();
   const { currentUser, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -62,9 +64,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className={`min-h-screen flex items-center justify-center ${themeClasses.background}`}>
       <div className="max-w-md w-full mx-4">
-        <div className="bg-card border rounded-lg p-8 shadow-lg">
+        <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-8 shadow-lg`}>
           {/* Header */}
           {/* <div className="text-center mb-8"> */}
           {/*   <h1 className="text-3xl font-bold text-foreground mb-2"> */}
@@ -75,7 +77,7 @@ export default function LoginPage() {
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+              <label htmlFor="email" className={`block text-sm font-medium ${themeClasses.foreground} mb-2`}>
                 Email
               </label>
               <input
@@ -83,7 +85,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                className={`w-full px-3 py-2 border ${themeClasses.border} rounded-md ${themeClasses.background} ${themeClasses.foreground} placeholder:${themeClasses.mutedForeground} focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
                 placeholder="Enter your email"
                 disabled={isLoading}
                 required
@@ -91,7 +93,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
+              <label htmlFor="password" className={`block text-sm font-medium ${themeClasses.foreground} mb-2`}>
                 Password
               </label>
               <input
@@ -99,7 +101,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                className={`w-full px-3 py-2 border ${themeClasses.border} rounded-md ${themeClasses.background} ${themeClasses.foreground} placeholder:${themeClasses.mutedForeground} focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
                 placeholder="Enter your password"
                 disabled={isLoading}
                 required
@@ -107,7 +109,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="bg-muted text-muted-foreground border border-border rounded-md p-3 text-sm">
+              <div className={`${themeClasses.muted} ${themeClasses.mutedForeground} border ${themeClasses.border} rounded-md p-3 text-sm`}>
                 {error}
               </div>
             )}

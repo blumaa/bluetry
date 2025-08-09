@@ -5,21 +5,18 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
 import { ManagePoemCard } from '@/components/ManagePoemCard';
 import { getPoems, updatePoem, deletePoem } from '@/lib/firebaseService';
 import { Poem } from '@/types';
 
-interface User {
-  id: string;
-  email: string;
-  displayName: string;
-  isAdmin: boolean;
-}
+// Removed unused User interface
 
 export default function PoemManagementPage() {
   const router = useRouter();
   const { theme } = useTheme();
+  const themeClasses = useThemeClasses();
   const { currentUser, loading } = useAuth();
   const [poems, setPoems] = useState<Poem[]>([]);
   const [loadingPoems, setLoadingPoems] = useState(true);
@@ -119,10 +116,10 @@ export default function PoemManagementPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className={`text-3xl font-bold ${themeClasses.foreground} mb-2`}>
               Poem Management
             </h1>
-            <p className="text-muted-foreground">
+            <p className={themeClasses.mutedForeground}>
               Manage all your poems - published and drafts
             </p>
           </div>
@@ -143,44 +140,44 @@ export default function PoemManagementPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-card border rounded-lg p-4">
-            <div className="text-2xl font-bold text-foreground">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}>
+            <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
               {poems.length}
             </div>
-            <div className="text-sm text-muted-foreground">Total Poems</div>
+            <div className={`text-sm ${themeClasses.mutedForeground}`}>Total Poems</div>
           </div>
           
-          <div className="bg-card border rounded-lg p-4">
-            <div className="text-2xl font-bold text-foreground">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}>
+            <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
               {poems.filter(p => p.published).length}
             </div>
-            <div className="text-sm text-muted-foreground">Published</div>
+            <div className={`text-sm ${themeClasses.mutedForeground}`}>Published</div>
           </div>
           
-          <div className="bg-card border rounded-lg p-4">
-            <div className="text-2xl font-bold text-foreground">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}>
+            <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
               {poems.filter(p => !p.published).length}
             </div>
-            <div className="text-sm text-muted-foreground">Drafts</div>
+            <div className={`text-sm ${themeClasses.mutedForeground}`}>Drafts</div>
           </div>
           
-          <div className="bg-card border rounded-lg p-4">
-            <div className="text-2xl font-bold text-foreground">
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}>
+            <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
               {poems.filter(p => p.pinned).length}
             </div>
-            <div className="text-sm text-muted-foreground">Pinned</div>
+            <div className={`text-sm ${themeClasses.mutedForeground}`}>Pinned</div>
           </div>
         </div>
 
         {/* Poems Grid */}
         <div className="space-y-4">
           {poems.length === 0 ? (
-            <div className="text-center py-12 bg-card border rounded-lg">
+            <div className={`text-center py-12 ${themeClasses.card} border ${themeClasses.border} rounded-lg`}>
               <div className="text-4xl mb-4">📝</div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
+              <h3 className={`text-xl font-semibold ${themeClasses.foreground} mb-2`}>
                 No poems found
               </h3>
-              <p className="text-muted-foreground">
+              <p className={themeClasses.mutedForeground}>
                 Create your first poem to get started.
               </p>
             </div>
@@ -201,12 +198,12 @@ export default function PoemManagementPage() {
 
         {/* Delete Confirmation Dialog */}
         {confirmDeleteId && (
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-background border rounded-lg p-6 max-w-md w-full mx-4">
-              <h3 className="text-lg font-semibold text-foreground mb-4">
+          <div className={`fixed inset-0 ${themeClasses.background}/80 backdrop-blur-sm flex items-center justify-center z-50`}>
+            <div className={`${themeClasses.background} border ${themeClasses.border} rounded-lg p-6 max-w-md w-full mx-4`}>
+              <h3 className={`text-lg font-semibold ${themeClasses.foreground} mb-4`}>
                 Confirm Delete
               </h3>
-              <p className="text-muted-foreground mb-6">
+              <p className={`${themeClasses.mutedForeground} mb-6`}>
                 Are you sure you want to delete this poem? This action cannot be undone.
               </p>
               <div className="flex items-center gap-4">

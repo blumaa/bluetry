@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PoemCard } from '@/components/PoemCard';
-import { CommentsSection } from '@/components/CommentsSection';
+// import { CommentsSection } from '@/components/CommentsSection'; // Commented out until Firebase index is created
 import { Button } from '@mond-design-system/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';

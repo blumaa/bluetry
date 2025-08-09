@@ -76,7 +76,7 @@ export function PoemCard({ poem }: PoemCardProps) {
         }
       } else {
         // Anonymous user - use localStorage and update poem count
-        const { getLikedPoems, addLikedPoem, removeLikedPoem } = await import('@/lib/utils');
+        const { addLikedPoem, removeLikedPoem } = await import('@/lib/utils');
         
         if (newLikedState) {
           addLikedPoem(poem.id);

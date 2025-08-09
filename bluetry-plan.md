@@ -85,18 +85,25 @@
 - when you click on content (text) of poemCard it should not be a link to individual poem card
 - okay, I need you to analyze the colors and the fonts in portfolio-2023, then, use the tokens in the mond-design-system within the bluetry app. you need to match the background of the light and dark scheme, the fonts, and colors between portfolio-2023 in the bluetry app.
 
+### more revisions
+-  fix the favicon
+#####
+
 ### Ice box ideas
 
 ## user profiles
+## sign up button and sign up form
 ## user following
 ## user connection management
 ## pinning others poems?
 ## the wall/feed
 ## the front page-- with all the most popular poems of the week and newest poems and trending poems-- three columns (maybe most commented on poems/controversial poems)
 ## user report/blocking, comment report blocking
+## notification button for alerts of activity - reports, likes, published by following
 ## personal profile page with pic
 ## hashtags and trending hashtags
 ## categories of poems
 ## saved poems
 ## reposting poems with comments
+## email subscriber management
 
