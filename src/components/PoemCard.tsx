@@ -153,7 +153,7 @@ export function PoemCard({ poem }: PoemCardProps) {
       <div className="flex items-start justify-between mb-4">
         <div>
           <h2 
-            className={`text-xl font-semibold ${themeClasses.foreground} hover:text-primary-500 transition-colors cursor-pointer`}
+            className={`text-xl font-semibold ${themeClasses.foreground} hover:text-primary-500 transition-colors cursor-pointer italic`}
             onClick={(e) => {
               e.stopPropagation(); // Prevent card click
               handleNavigateToPoem();

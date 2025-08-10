@@ -75,6 +75,7 @@ export function EmailSignup() {
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <Input
+            id="email-signup-input"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}

@@ -15,6 +15,14 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: 'bluetry - Poetry & Words',
   description: 'A beautiful place to share and discover poetry',
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.png?v=2', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png?v=2', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.ico?v=2', sizes: 'any' }
+    ],
+    apple: { url: '/apple-touch-icon.png?v=2', sizes: '180x180', type: 'image/png' },
+  },
 };
 
 export default function RootLayout({

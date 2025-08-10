@@ -268,6 +268,7 @@ export default function CreatePage() {
             <div className="flex flex-wrap gap-6">
               <label className="flex items-center gap-3 cursor-pointer">
                 <Input
+                  id="publish-checkbox"
                   type="checkbox"
                   checked={isPublished}
                   onChange={(e) => setIsPublished(e.target.checked)}
@@ -282,6 +283,7 @@ export default function CreatePage() {
 
               <label className="flex items-center gap-3 cursor-pointer">
                 <Input
+                  id="pin-checkbox"
                   type="checkbox"
                   checked={isPinned}
                   onChange={(e) => setIsPinned(e.target.checked)}
