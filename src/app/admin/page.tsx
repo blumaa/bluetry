@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
+import { getActivity, getPoems, Activity } from '@/lib/firebaseService';
+import { User, Poem } from '@/types';
+import { formatRelativeTime } from '@/lib/utils';
 import mockPoemsData from '@/data/mock-poems.json';
 
 // Removed unused User interface - using inline type
@@ -14,8 +17,11 @@ export default function AdminPage() {
   const router = useRouter();
   const { theme } = useTheme();
   const themeClasses = useThemeClasses();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activityFilter, setActivityFilter] = useState<'all' | 'comments' | 'poems' | 'reports'>('all');
+  const [realPoems, setRealPoems] = useState<Poem[]>([]);
 
   useEffect(() => {
     // Check if user is authenticated
@@ -30,10 +36,114 @@ export default function AdminPage() {
     setLoading(false);
   }, [router]);
 
+  useEffect(() => {
+    // Load activity data and real poems
+    const loadData = async () => {
+      try {
+        const [activityData, poemsData] = await Promise.all([
+          getActivity(50), // Get last 50 activities
+          getPoems(false) // Get all poems including drafts
+        ]);
+        setActivities(activityData);
+        setRealPoems(poemsData);
+      } catch (error) {
+        console.error('Error loading admin data:', error);
+      }
+    };
+
+    if (user) {
+      loadData();
+    }
+  }, [user]);
+
   const handleLogout = () => {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
     router.push('/');
+  };
+
+  // Filter activities based on selected filter
+  const filteredActivities = activities.filter(activity => {
+    switch (activityFilter) {
+      case 'comments':
+        return ['comment_added', 'comment_liked', 'comment_replied', 'comment_reported', 'comment_deleted'].includes(activity.type);
+      case 'poems':
+        return ['poem_created', 'poem_published', 'poem_liked'].includes(activity.type);
+      case 'reports':
+        return activity.type === 'comment_reported';
+      default:
+        return true;
+    }
+  });
+
+  // Format activity for display
+  const formatActivity = (activity: Activity) => {
+    const getIcon = () => {
+      switch (activity.type) {
+        case 'comment_added': return '💬';
+        case 'comment_liked': return '❤️';
+        case 'comment_replied': return '↩️';
+        case 'comment_reported': return '⚠️';
+        case 'comment_deleted': return '🗑️';
+        case 'poem_created': return '✏️';
+        case 'poem_published': return '📖';
+        case 'poem_liked': return '❤️';
+        case 'subscriber_joined': return '📧';
+        default: return '•';
+      }
+    };
+
+    const getDescription = () => {
+      const metadata = activity.metadata || {};
+      const userName = activity.userId === 'anonymous' ? 'Anonymous user' : 'User';
+      
+      switch (activity.type) {
+        case 'comment_added':
+          return `${userName} commented on "${metadata.title}"`;
+        case 'comment_liked':
+          return `${userName} liked a comment`;
+        case 'comment_replied':
+          return `${userName} replied to a comment on "${metadata.title}"`;
+        case 'comment_reported':
+          return `${userName} reported a comment on "${metadata.title}"`;
+        case 'comment_deleted':
+          return `Admin deleted a comment by ${metadata.originalAuthor} on "${metadata.title}"`;
+        case 'poem_created':
+          return `${userName} created "${metadata.title}"`;
+        case 'poem_published':
+          return `${userName} published "${metadata.title}"`;
+        case 'poem_liked':
+          return `${userName} liked "${metadata.title}"`;
+        case 'subscriber_joined':
+          return `New subscriber: ${metadata.email}`;
+        default:
+          return `${activity.type} activity`;
+      }
+    };
+
+    const getColor = () => {
+      switch (activity.type) {
+        case 'comment_reported':
+          return 'bg-red-500';
+        case 'comment_deleted':
+          return 'bg-red-400';
+        case 'poem_published':
+        case 'comment_added':
+          return 'bg-primary';
+        case 'comment_liked':
+        case 'poem_liked':
+          return 'bg-pink-500';
+        default:
+          return 'bg-primary/60';
+      }
+    };
+
+    return {
+      icon: getIcon(),
+      description: getDescription(),
+      color: getColor(),
+      time: formatRelativeTime(activity.timestamp)
+    };
   };
 
   if (loading) {
@@ -48,11 +158,20 @@ export default function AdminPage() {
     return null; // Will redirect to login
   }
 
-  const totalPoems = mockPoemsData.length;
-  const publishedPoems = mockPoemsData.filter(p => p.published).length;
-  const pinnedPoems = mockPoemsData.filter(p => p.pinned).length;
-  const totalLikes = mockPoemsData.reduce((sum, p) => sum + p.likeCount, 0);
-  const totalComments = mockPoemsData.reduce((sum, p) => sum + p.commentCount, 0);
+  // Use real poems if available, fallback to mock data
+  const poemsToUse = realPoems.length > 0 ? realPoems : mockPoemsData;
+  const totalPoems = poemsToUse.length;
+  const publishedPoems = poemsToUse.filter(p => p.published).length;
+  const pinnedPoems = poemsToUse.filter(p => p.pinned).length;
+  const totalLikes = poemsToUse.reduce((sum, p) => sum + (p.likeCount || 0), 0);
+
+  // Count comment-related activities
+  const commentActivities = activities.filter(a => 
+    ['comment_added', 'comment_liked', 'comment_replied', 'comment_reported', 'comment_deleted'].includes(a.type)
+  ).length;
+
+  // Count reported comments
+  const reportedComments = activities.filter(a => a.type === 'comment_reported').length;
 
   return (
     <div className={`min-h-screen ${themeClasses.background}`}>
@@ -85,7 +204,7 @@ export default function AdminPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
             <div className="flex items-center justify-between">
               <div>
@@ -123,6 +242,19 @@ export default function AdminPage() {
                 <p className={`text-2xl font-bold ${themeClasses.foreground}`}>{totalLikes}</p>
               </div>
               <div className="text-2xl">❤️</div>
+            </div>
+          </div>
+
+          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className={`text-sm font-medium ${themeClasses.mutedForeground}`}>Comment Activity</p>
+                <p className={`text-2xl font-bold ${themeClasses.foreground}`}>{commentActivities}</p>
+                {reportedComments > 0 && (
+                  <p className="text-xs text-red-500">{reportedComments} reports</p>
+                )}
+              </div>
+              <div className="text-2xl">💬</div>
             </div>
           </div>
         </div>
@@ -173,20 +305,59 @@ export default function AdminPage() {
           </div>
 
           <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
-            <h2 className={`text-xl font-semibold ${themeClasses.foreground} mb-4`}>Recent Activity</h2>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className={themeClasses.mutedForeground}>Total engagement: {totalComments} comments</span>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className={`text-xl font-semibold ${themeClasses.foreground}`}>Recent Activity</h2>
+              
+              {/* Activity Filter */}
+              <div className="flex flex-wrap gap-2">
+                {['all', 'comments', 'poems', 'reports'].map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setActivityFilter(filter as 'all' | 'comments' | 'poems' | 'reports')}
+                    className={`px-4 py-2 text-sm rounded-lg font-medium transition-colors ${
+                      activityFilter === filter
+                        ? 'bg-primary text-white shadow-md'
+                        : `${themeClasses.muted} ${themeClasses.mutedForeground} hover:${themeClasses.foreground} hover:bg-primary/10 border ${themeClasses.border}`
+                    }`}
+                  >
+                    {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  </button>
+                ))}
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                <span className={themeClasses.mutedForeground}>Most liked poem: "Diary of a Programmer 49"</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-2 h-2 bg-primary/60 rounded-full"></div>
-                <span className={themeClasses.mutedForeground}>Latest poem: "Thanks for Caring About Me"</span>
-              </div>
+            </div>
+
+            <div className="space-y-3 max-h-64 overflow-y-auto">
+              {filteredActivities.length === 0 ? (
+                <div className={`text-center py-4 ${themeClasses.mutedForeground}`}>
+                  No activity found for the selected filter.
+                </div>
+              ) : (
+                filteredActivities.slice(0, 10).map((activity) => {
+                  const formatted = formatActivity(activity);
+                  return (
+                    <div key={activity.id} className="flex items-start gap-3 text-sm">
+                      <div className={`w-2 h-2 ${formatted.color} rounded-full mt-2 flex-shrink-0`}></div>
+                      <div className="flex-1 min-w-0">
+                        <div className={`${themeClasses.foreground} flex items-center gap-2`}>
+                          <span>{formatted.icon}</span>
+                          <span className="truncate">{formatted.description}</span>
+                        </div>
+                        <div className={`text-xs ${themeClasses.mutedForeground} mt-1`}>
+                          {formatted.time}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+              
+              {filteredActivities.length > 10 && (
+                <div className={`text-center pt-2 border-t ${themeClasses.border}`}>
+                  <span className={`text-xs ${themeClasses.mutedForeground}`}>
+                    +{filteredActivities.length - 10} more activities
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -204,12 +375,12 @@ export default function AdminPage() {
           
           <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6`}>
             <div className="space-y-4">
-              {mockPoemsData.slice(0, 5).map((poem) => (
+              {poemsToUse.slice(0, 5).map((poem) => (
                 <div key={poem.id} className={`flex items-center justify-between py-2 border-b ${themeClasses.border} last:border-b-0`}>
                   <div>
                     <h3 className={`font-medium ${themeClasses.foreground}`}>{poem.title}</h3>
                     <p className={`text-sm ${themeClasses.mutedForeground}`}>
-                      {new Date(poem.createdAt).toLocaleDateString()} • {poem.likeCount} likes • {poem.commentCount} comments
+                      {new Date(poem.createdAt).toLocaleDateString()} • {poem.likeCount || 0} likes • {poem.commentCount || 0} comments
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

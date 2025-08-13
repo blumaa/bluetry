@@ -72,7 +72,7 @@ export function createSlug(title: string): string {
     .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
 }
 
-export function findPoemBySlugOrId(poems: any[], slugOrId: string): any | null {
+export function findPoemBySlugOrId<T extends { title: string; id: string }>(poems: T[], slugOrId: string): T | null {
   // First try to find by slug (generated from title)
   const bySlug = poems.find(poem => createSlug(poem.title) === slugOrId);
   if (bySlug) return bySlug;

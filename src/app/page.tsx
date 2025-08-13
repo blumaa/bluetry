@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PoemCard } from '@/components/PoemCard';
 import { EmailSignup } from '@/components/EmailSignup';
@@ -13,7 +13,7 @@ import { listenToPoems } from '@/lib/firebaseService';
 
 const POEMS_PER_PAGE = 5;
 
-export default function Home() {
+function HomeContent() {
   const { theme } = useTheme();
   const themeClasses = useThemeClasses();
   const { currentPage, setCurrentPage } = useUI();
@@ -184,5 +184,13 @@ export default function Home() {
         </div>
       </aside>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }

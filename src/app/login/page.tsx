@@ -42,19 +42,22 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       // AuthContext will handle the user state and redirect via useEffect
       // The redirect happens in the useEffect above based on user role
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
       
       let errorMessage = 'Failed to sign in. Please try again.';
       
-      if (error.code === 'auth/user-not-found') {
-        errorMessage = 'No account found with this email address.';
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Incorrect password.';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Invalid email address.';
-      } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = 'Too many failed attempts. Please try again later.';
+      if (error && typeof error === 'object' && 'code' in error) {
+        const firebaseError = error as { code: string };
+        if (firebaseError.code === 'auth/user-not-found') {
+          errorMessage = 'No account found with this email address.';
+        } else if (firebaseError.code === 'auth/wrong-password') {
+          errorMessage = 'Incorrect password.';
+        } else if (firebaseError.code === 'auth/invalid-email') {
+          errorMessage = 'Invalid email address.';
+        } else if (firebaseError.code === 'auth/too-many-requests') {
+          errorMessage = 'Too many failed attempts. Please try again later.';
+        }
       }
       
       setError(errorMessage);

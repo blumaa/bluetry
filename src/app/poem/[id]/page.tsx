@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PoemCard } from '@/components/PoemCard';
-// import { CommentsSection } from '@/components/CommentsSection'; // Commented out until Firebase index is created
 import { Button } from '@mond-design-system/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -85,9 +84,6 @@ export default function PoemPage() {
         <div className="space-y-8">
           {/* Poem Display */}
           <PoemCard poem={poem} />
-
-          {/* Comments Section - Temporarily disabled until Firebase index is created */}
-          {/* <CommentsSection poemId={poem.id} poemTitle={poem.title} /> */}
 
           {/* Additional Actions */}
           <div className="flex justify-center pt-8">

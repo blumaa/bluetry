@@ -19,15 +19,11 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 async function migratePoems() {
-  console.log('Starting poem migration...');
-  console.log(`Found ${mockPoemsData.length} poems to migrate`);
   
   // Test with just the first poem
   const firstPoem = mockPoemsData[0];
   
   try {
-    console.log(`Testing with first poem: ${firstPoem.title}`);
-    
     // Clean and validate the poem data
     const cleanPoem = {
       title: String(firstPoem.title || 'Untitled'),
@@ -41,19 +37,14 @@ async function migratePoems() {
       updatedAt: new Date(firstPoem.updatedAt || new Date()),
     };
     
-    console.log('Clean poem data:', cleanPoem);
-    
     // Use a simple document ID for testing
     await setDoc(doc(db, 'poems', 'test-migration-1'), cleanPoem);
-    
-    console.log(`✅ Successfully migrated test poem!`);
     
   } catch (error) {
     console.error(`❌ Error migrating test poem:`, error);
     console.error('Error details:', error.code, error.message);
   }
   
-  console.log('Test complete!');
   process.exit(0);
 }
 

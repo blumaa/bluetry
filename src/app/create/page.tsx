@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -13,7 +13,7 @@ import { createPoem, updatePoem, getPoemById } from '@/lib/firebaseService';
 
 // Removed unused User interface
 
-export default function CreatePage() {
+function CreatePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { theme } = useTheme();
@@ -313,5 +313,13 @@ export default function CreatePage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function CreatePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreatePageContent />
+    </Suspense>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -10,6 +9,7 @@ import { Poem } from '@/types';
 import { Button } from '@mond-design-system/theme';
 import { formatRelativeTime, getPoemUrl } from '@/lib/utils';
 import { likePoem, unlikePoem, isPoemLikedByUser } from '@/lib/firebaseService';
+import { CommentsSection } from './CommentsSection';
 
 interface PoemCardProps {
   poem: Poem;
@@ -25,6 +25,7 @@ export function PoemCard({ poem }: PoemCardProps) {
   const [isLiking, setIsLiking] = useState(false);
   const [loadingLikeStatus, setLoadingLikeStatus] = useState(true);
   const [showCopied, setShowCopied] = useState(false);
+  const [commentsExpanded, setCommentsExpanded] = useState(false);
 
   useEffect(() => {
     const checkLikeStatus = async () => {
@@ -115,37 +116,16 @@ export function PoemCard({ poem }: PoemCardProps) {
   };
 
   const handleNavigateToPoem = () => {
-    console.log('handleNavigateToPoem called, navigating to:', getPoemUrl(poem));
     // Navigate to poem page
     router.push(getPoemUrl(poem));
   };
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    console.log('Card clicked!', e.target);
-    
-    // Don't navigate if clicking on interactive elements or poem content
-    const target = e.target as HTMLElement;
-    if (
-      target.closest('button') || 
-      target.closest('a') || 
-      target.closest('[role="button"]') ||
-      target.closest('.poem-content')
-    ) {
-      console.log('Clicked on interactive element, not navigating');
-      return;
-    }
-    
-    console.log('About to navigate to poem page');
-    // Navigate to poem page
-    handleNavigateToPoem();
-  };
 
   const displayContent = poem.content;
 
   return (
     <article 
-      className={`${themeClasses.card} border ${themeClasses.border} rounded-lg hover:shadow-md transition-shadow cursor-pointer`}
-      onClick={handleCardClick}
+      className={`${themeClasses.card} border ${themeClasses.border} rounded-lg hover:shadow-md transition-shadow`}
     >
       {/* Clickable padding wrapper */}
       <div className="p-6">
@@ -154,10 +134,7 @@ export function PoemCard({ poem }: PoemCardProps) {
         <div>
           <h2 
             className={`text-xl font-semibold ${themeClasses.foreground} hover:text-primary-500 transition-colors cursor-pointer italic`}
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent card click
-              handleNavigateToPoem();
-            }}
+            onClick={handleNavigateToPoem}
           >
             {poem.title}
           </h2>
@@ -186,10 +163,7 @@ export function PoemCard({ poem }: PoemCardProps) {
             variant="ghost"
             size="sm"
             isDarkMode={theme === 'dark'}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleLike();
-            }}
+            onClick={handleLike}
             disabled={isLiking || loadingLikeStatus}
             className={`flex items-center gap-2 px-3 py-1 ${
               isLiked ? `text-primary-500 ${themeClasses.conditional('hover:bg-primary-50', 'hover:bg-primary-900/20')}` : ''
@@ -203,33 +177,37 @@ export function PoemCard({ poem }: PoemCardProps) {
             <span className="text-sm">{likeCount}</span>
           </Button>
 
-          <Link href={`${getPoemUrl(poem)}#comments`}>
-            <Button
-              variant="ghost"
-              size="sm"
-              isDarkMode={theme === 'dark'}
-              className="flex items-center gap-2 px-3 py-1"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <span className="text-lg">💬</span>
-              <span className="text-sm">{poem.commentCount}</span>
-            </Button>
-          </Link>
+          <Button
+            variant="ghost"
+            size="sm"
+            isDarkMode={theme === 'dark'}
+            className="flex items-center gap-2 px-3 py-1"
+            onClick={() => setCommentsExpanded(!commentsExpanded)}
+          >
+            <span className="text-lg">💬</span>
+            <span className="text-sm">{poem.commentCount}</span>
+          </Button>
 
           <Button
             variant="ghost"
             size="sm"
             isDarkMode={theme === 'dark'}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleShare();
-            }}
+            onClick={handleShare}
             className="flex items-center gap-2 px-3 py-1"
           >
             <span className="text-lg">🔗</span>
             <span className="text-sm">{showCopied ? 'Copied!' : 'Share'}</span>
           </Button>
         </div>
+
+        {/* Comments Section */}
+        <CommentsSection 
+          poemId={poem.id} 
+          poemTitle={poem.title} 
+          initialCommentCount={poem.commentCount}
+          isExpanded={commentsExpanded}
+          onToggle={() => setCommentsExpanded(!commentsExpanded)}
+        />
       </div>
     </article>
   );

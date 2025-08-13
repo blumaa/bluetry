@@ -87,6 +87,21 @@
 
 ### more revisions
 -  fix the favicon
+
+## email subscriber management
+
+## comments
+
+- let's build the comments section of the site.
+- users/viewers should be able to add comments to the poems.
+- comments section should be expandable by an upside down chevron icon that flips when open.
+- users should be able to like comments
+- users should be able to reply to other comments and see the threads (indented)
+- users should be able to report comments (send email to admin with report that includes poem title- linked- and comment contents)
+- I should be able to delete comments (add button to delete comment when I am logged in)
+- add comment activity to the admin activity page
+- create filter for comments on admin activity page
+
 #####
 
 ### Ice box ideas
@@ -105,5 +120,6 @@
 ## categories of poems
 ## saved poems
 ## reposting poems with comments
-## email subscriber management
+
+
 

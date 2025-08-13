@@ -19,7 +19,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 async function migratePoems() {
-  console.log('Starting poem migration...');
   
   for (const poem of mockPoemsData) {
     try {
@@ -30,13 +29,11 @@ async function migratePoems() {
         updatedAt: new Date(poem.updatedAt),
       });
       
-      console.log(`✅ Migrated poem: ${poem.title}`);
     } catch (error) {
       console.error(`❌ Error migrating poem ${poem.title}:`, error);
     }
   }
   
-  console.log('✨ Migration complete!');
 }
 
 // Run migration

@@ -21,6 +21,7 @@ export default function ActivityPage() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [poems, setPoems] = useState<Array<{id: string; title: string}>>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [activityFilter, setActivityFilter] = useState<'all' | 'comments' | 'poems' | 'reports'>('all');
   const [stats, setStats] = useState({
     totalPoems: 0,
     totalLikes: 0,
@@ -70,6 +71,20 @@ export default function ActivityPage() {
     }
   };
 
+  // Filter activities based on selected filter
+  const filteredActivities = activities.filter(activity => {
+    switch (activityFilter) {
+      case 'comments':
+        return ['comment_added', 'comment_liked', 'comment_replied', 'comment_reported', 'comment_deleted'].includes(activity.type);
+      case 'poems':
+        return ['poem_created', 'poem_published', 'poem_liked'].includes(activity.type);
+      case 'reports':
+        return activity.type === 'comment_reported';
+      default:
+        return true;
+    }
+  });
+
   const getActivityIcon = (type: Activity['type']) => {
     switch (type) {
       case 'poem_created':
@@ -79,6 +94,14 @@ export default function ActivityPage() {
         return '❤️';
       case 'comment_added':
         return '💬';
+      case 'comment_liked':
+        return '❤️';
+      case 'comment_replied':
+        return '↩️';
+      case 'comment_reported':
+        return '⚠️';
+      case 'comment_deleted':
+        return '🗑️';
       case 'subscriber_joined':
         return '📬';
       default:
@@ -101,6 +124,9 @@ export default function ActivityPage() {
       return 'Untitled';
     };
 
+    const metadata = activity.metadata || {};
+    const userName = activity.userId === 'anonymous' ? 'Anonymous user' : 'User';
+
     switch (activity.type) {
       case 'poem_created':
         return `New poem created: "${getPoemTitle()}"`;
@@ -109,7 +135,15 @@ export default function ActivityPage() {
       case 'poem_liked':
         return `Poem "${getPoemTitle()}" received a like`;
       case 'comment_added':
-        return `New comment added to "${getPoemTitle()}"`;
+        return `${userName} commented on "${getPoemTitle()}"`;
+      case 'comment_liked':
+        return `${userName} liked a comment`;
+      case 'comment_replied':
+        return `${userName} replied to a comment on "${getPoemTitle()}"`;
+      case 'comment_reported':
+        return `${userName} reported a comment on "${getPoemTitle()}"`;
+      case 'comment_deleted':
+        return `Admin deleted a comment by ${metadata.originalAuthor} on "${getPoemTitle()}"`;
       case 'subscriber_joined':
         return `New email subscriber: ${activity.metadata?.email || 'Someone'}`;
       default:
@@ -185,7 +219,31 @@ export default function ActivityPage() {
 
         {/* Activity Feed */}
         <div className="space-y-4">
-          <h2 className={`text-xl font-semibold ${themeClasses.foreground} mb-4`}>Recent Activity</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className={`text-xl font-semibold ${themeClasses.foreground}`}>Recent Activity</h2>
+            
+            {/* Activity Filter Buttons */}
+            <div className="flex flex-wrap gap-2">
+              {['all', 'comments', 'poems', 'reports'].map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setActivityFilter(filter as 'all' | 'comments' | 'poems' | 'reports')}
+                  className={`px-4 py-2 text-sm rounded-lg font-medium transition-colors ${
+                    activityFilter === filter
+                      ? 'bg-primary text-white shadow-md'
+                      : `${themeClasses.muted} ${themeClasses.mutedForeground} hover:${themeClasses.foreground} hover:bg-primary/10 border ${themeClasses.border}`
+                  }`}
+                >
+                  {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                  {filter === 'reports' && activities.filter(a => a.type === 'comment_reported').length > 0 && (
+                    <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                      {activities.filter(a => a.type === 'comment_reported').length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
           
           {loadingData ? (
             <div className="space-y-3">
@@ -193,19 +251,22 @@ export default function ActivityPage() {
                 <div key={i} className={`h-20 ${themeClasses.muted} animate-pulse rounded-lg`} />
               ))}
             </div>
-          ) : activities.length === 0 ? (
+          ) : filteredActivities.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📊</div>
               <h3 className={`text-xl font-semibold ${themeClasses.foreground} mb-2`}>
-                No activity yet
+                {activityFilter === 'all' ? 'No activity yet' : `No ${activityFilter} activity`}
               </h3>
               <p className={themeClasses.mutedForeground}>
-                Activity will appear here as people interact with your poems.
+                {activityFilter === 'all' 
+                  ? 'Activity will appear here as people interact with your poems.'
+                  : `${activityFilter.charAt(0).toUpperCase() + activityFilter.slice(1)} activity will appear here.`
+                }
               </p>
             </div>
           ) : (
             <div className="space-y-3">
-              {activities.slice(0, 50).map((activity) => (
+              {filteredActivities.slice(0, 50).map((activity) => (
                 <div
                   key={activity.id}
                   className={`flex items-start gap-4 p-4 ${themeClasses.card} border ${themeClasses.border} rounded-lg hover:shadow-sm transition-shadow`}

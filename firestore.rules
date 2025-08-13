@@ -36,18 +36,6 @@ service cloud.firestore {
       allow read: if request.auth != null;
     }
     
-    // Comments collection
-    match /comments/{commentId} {
-      // Anyone can read comments
-      allow read: if true;
-      // Only authenticated users can create comments
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.authorId;
-      // Only comment author or admin can update/delete comments
-      allow update, delete: if request.auth != null && 
-        (request.auth.uid == resource.data.authorId || 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
-    }
-    
     // Activity collection - for tracking user actions
     match /activity/{activityId} {
       // Only admins can read activity logs
@@ -67,6 +55,39 @@ service cloud.firestore {
       // Only admins can update/delete subscriptions
       allow update, delete: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    // Comment likes - allow read/write for authenticated users and session-based for anonymous
+    match /commentLikes/{likeId} {
+      allow read: if true; // Anyone can read like status
+      allow write: if request.auth != null // Authenticated users
+        || (request.auth == null && resource == null && 'sessionId' in request.resource.data); // Anonymous users with sessionId
+      allow delete: if request.auth != null // Only authenticated users can unlike
+        || (request.auth == null && resource.data.sessionId != null); // Anonymous users with their sessionId
+    }
+
+    // Comment reports - allow write for anyone, read for admins only
+    match /commentReports/{reportId} {
+      allow read: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow write: if true; // Anyone can report
+    }
+
+    // Bot checks - allow read/write for the session that created them
+    match /botChecks/{checkId} {
+      allow read, write: if true; // Allow for anonymous bot checking
+    }
+
+    // Comments collection
+    match /comments/{commentId} {
+      allow read: if true; // Anyone can read comments
+      allow create: if request.auth != null // Authenticated users
+        || (request.auth == null && 'sessionId' in request.resource.data && 'botCheckPassed' in request.resource.data && request.resource.data.botCheckPassed == true); // Anonymous users with bot check
+      allow update: if request.auth != null &&
+        (request.auth.uid == resource.data.authorId || // Comment author
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true); // Or admin
+      allow delete: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true; // Only admins can delete
     }
   }
 }
