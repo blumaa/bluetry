@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@mond-design-system/theme':
-        specifier: ^1.0.7
-        version: 1.0.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^1.0.8
+        version: 1.0.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tiptap/extension-color':
         specifier: ^3.0.9
         version: 3.0.9(@tiptap/extension-text-style@3.0.9(@tiptap/core@3.0.9(@tiptap/pm@3.0.9)))
@@ -57,6 +57,9 @@ importers:
       '@eslint/eslintrc':
         specifier: ^3
         version: 3.3.1
+      '@next/eslint-plugin-next':
+        specifier: ^15.4.6
+        version: 15.4.6
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.11
@@ -84,6 +87,9 @@ importers:
       eslint-config-next:
         specifier: 15.4.6
         version: 15.4.6(eslint@9.32.0(jiti@2.5.1))(typescript@5.9.2)
+      eslint-plugin-react-hooks:
+        specifier: ^5.2.0
+        version: 5.2.0(eslint@9.32.0(jiti@2.5.1))
       jest:
         specifier: ^30.0.5
         version: 30.0.5(@types/node@20.19.9)(ts-node@10.9.2(@types/node@20.19.9)(typescript@5.9.2))
@@ -861,8 +867,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@mond-design-system/theme@1.0.7':
-    resolution: {integrity: sha512-iHYiH6IKl0kz/M9SXb7lZ8oucxEkccAVH/Y8NEs73Mj6LMLna83P3UeN0QMwwuTT4gCdvBM2zYAKGP3VvMTK2A==}
+  '@mond-design-system/theme@1.0.8':
+    resolution: {integrity: sha512-tqgiOdVeXUK1peKaFt/di1dYTz+wv4MUl4h6NIFBmY9OCBgkLOFDa0fIJCndapVri8C4t0DTb8XxZu6hSAdrIQ==}
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
@@ -4687,7 +4693,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
 
-  '@mond-design-system/theme@1.0.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@mond-design-system/theme@1.0.8(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)

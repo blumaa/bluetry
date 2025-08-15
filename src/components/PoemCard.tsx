@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Poem } from '@/types';
-import { Button } from '@mond-design-system/theme';
+import { Button, Card } from '@mond-design-system/theme';
 import { formatRelativeTime, getPoemUrl } from '@/lib/utils';
 import { likePoem, unlikePoem, isPoemLikedByUser } from '@/lib/firebaseService';
 import { CommentsSection } from './CommentsSection';
@@ -124,41 +124,39 @@ export function PoemCard({ poem }: PoemCardProps) {
   const displayContent = poem.content;
 
   return (
-    <article 
-      className={`${themeClasses.card} border ${themeClasses.border} rounded-lg hover:shadow-md transition-shadow`}
+    <Card 
+      isDarkMode={theme === 'dark'}
+      className="hover:shadow-md transition-shadow"
     >
-      {/* Clickable padding wrapper */}
-      <div className="p-6">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h2 
-            className={`text-xl font-semibold ${themeClasses.foreground} hover:text-primary-500 transition-colors cursor-pointer italic`}
-            onClick={handleNavigateToPoem}
-          >
-            {poem.title}
-          </h2>
-          <p className={`text-sm ${themeClasses.mutedForeground} mt-1`}>
-            {formatRelativeTime(poem.createdAt)}
-            {poem.pinned && (
-              <span className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs ${themeClasses.conditional('bg-primary-100 text-primary-600', 'bg-primary-900/20 text-primary-400')}`}>
-                📌 Pinned
-              </span>
-            )}
-          </p>
-        </div>
-      </div>
+      <Card.Header>
+        <Card.Title
+          as="h2" 
+          className="text-xl font-semibold hover:text-primary-500 transition-colors cursor-pointer italic"
+          onClick={handleNavigateToPoem}
+        >
+          {poem.title}
+        </Card.Title>
+        <Card.Subtitle className={`text-sm ${themeClasses.mutedForeground} mt-1`}>
+          {formatRelativeTime(poem.createdAt)}
+          {poem.pinned && (
+            <span className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs ${themeClasses.conditional('bg-primary-100 text-primary-600', 'bg-primary-900/20 text-primary-400')}`}>
+              📌 Pinned
+            </span>
+          )}
+        </Card.Subtitle>
+      </Card.Header>
 
-        {/* Poem Content */}
-        <div className="mb-4 poem-content">
+      <Card.Content>
+        <div className="poem-content">
           <div 
             className={`leading-relaxed prose prose-lg max-w-none prose-p:my-2 prose-headings:my-2 ${themeClasses.conditional('[&_*]:!text-[#414A4C]', '[&_*]:!text-[#DDE6ED]')}`}
             dangerouslySetInnerHTML={{ __html: displayContent }}
           />
         </div>
+      </Card.Content>
 
-        {/* Actions */}
-        <div className={`flex items-center gap-2 pt-4 border-t ${themeClasses.border}`}>
+      <Card.Footer>
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
@@ -199,16 +197,16 @@ export function PoemCard({ poem }: PoemCardProps) {
             <span className="text-sm">{showCopied ? 'Copied!' : 'Share'}</span>
           </Button>
         </div>
+      </Card.Footer>
 
-        {/* Comments Section */}
-        <CommentsSection 
-          poemId={poem.id} 
-          poemTitle={poem.title} 
-          initialCommentCount={poem.commentCount}
-          isExpanded={commentsExpanded}
-          onToggle={() => setCommentsExpanded(!commentsExpanded)}
-        />
-      </div>
-    </article>
+      {/* Comments Section */}
+      <CommentsSection 
+        poemId={poem.id} 
+        poemTitle={poem.title} 
+        initialCommentCount={poem.commentCount}
+        isExpanded={commentsExpanded}
+        onToggle={() => setCommentsExpanded(!commentsExpanded)}
+      />
+    </Card>
   );
 }

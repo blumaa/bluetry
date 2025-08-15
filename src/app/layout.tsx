@@ -4,7 +4,9 @@ import './globals.css';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UIProvider } from '@/contexts/UIContext';
+import { ToastProvider } from '@/contexts/ToastContext';
 import { LayoutWrapper } from '@/components/LayoutWrapper';
+import { ToastContainer } from '@/components/ui/ToastContainer';
 
 const dmSans = DM_Sans({
   variable: '--font-dm-sans',
@@ -38,9 +40,12 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <UIProvider>
-              <LayoutWrapper>
-                {children}
-              </LayoutWrapper>
+              <ToastProvider>
+                <LayoutWrapper>
+                  {children}
+                </LayoutWrapper>
+                <ToastContainer />
+              </ToastProvider>
             </UIProvider>
           </AuthProvider>
         </ThemeProvider>

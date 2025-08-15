@@ -9,7 +9,7 @@ import { Comment } from '@/types';
 import { getComments, addComment, likeComment, unlikeComment, isCommentLikedByUser, deleteComment } from '@/lib/firebaseService';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Button, Input } from '@mond-design-system/theme';
+import { Button, Input, Card } from '@mond-design-system/theme';
 import { BotCheck } from './BotCheck';
 import { ReportModal } from './ReportModal';
 
@@ -117,7 +117,7 @@ export function CommentsSection({ poemId, poemTitle, initialCommentCount = 0, is
   };
 
   return (
-    <div className={`border-t ${themeClasses.border} pt-4`} id="comments">
+    <div className={`border-t ${themeClasses.border} pt-4 px-3`} id="comments">
       {/* Toggle Button */}
       <button
         onClick={handleToggle}
@@ -319,18 +319,17 @@ function CommentItem({ comment, poemTitle, onReplyAdded, onCommentDeleted }: Com
   };
   
   return (
-    <div 
-      className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}
+    <Card 
+      isDarkMode={theme === 'dark'}
       style={{ marginLeft: `${comment.depth * 24}px` }}
     >
-      {comment.isDeleted ? (
-        /* Simple deleted message */
-        <div className={`text-sm italic ${themeClasses.mutedForeground} py-2`}>
-          Comment has been deleted
-        </div>
-      ) : (
-        <>
-          <div className="flex items-start justify-between mb-3">
+      <Card.Header>
+        {comment.isDeleted ? (
+          <div className={`text-sm italic ${themeClasses.mutedForeground} py-2`}>
+            Comment has been deleted
+          </div>
+        ) : (
+          <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               {/* Avatar */}
               <div className={`w-8 h-8 ${themeClasses.muted} rounded-full flex items-center justify-center`}>
@@ -354,62 +353,70 @@ function CommentItem({ comment, poemTitle, onReplyAdded, onCommentDeleted }: Com
               </div>
             </div>
           </div>
-          
-          {/* Comment content */}
-          <div className="prose prose-sm max-w-none">
-            <div 
-              className={`${themeClasses.foreground} whitespace-pre-wrap leading-relaxed`}
-              dangerouslySetInnerHTML={{ __html: comment.content }}
-            />
-          </div>
+        )}
+      </Card.Header>
+      
+      {!comment.isDeleted && (
+        <>
+          <Card.Content>
+            {/* Comment content */}
+            <div className="prose prose-sm max-w-none">
+              <div 
+                className={`${themeClasses.foreground} whitespace-pre-wrap leading-relaxed`}
+                dangerouslySetInnerHTML={{ __html: comment.content }}
+              />
+            </div>
+          </Card.Content>
 
-          {/* Comment actions */}
-          <div className={`flex items-center gap-4 mt-3 pt-3 border-t ${themeClasses.border}`}>
-            {/* Like Button */}
-            <button 
-              onClick={handleLike}
-              disabled={isLiking || loadingLikeStatus}
-              className={`text-sm flex items-center gap-1 transition-colors ${
-                isLiked 
-                  ? `${themeClasses.foreground} hover:${themeClasses.foreground}/80` 
-                  : `${themeClasses.mutedForeground} hover:${themeClasses.foreground}`
-              }`}
-            >
-              {loadingLikeStatus ? (
-                <span className="text-lg animate-pulse">🤍</span>
-              ) : (
-                <span className="text-lg">{isLiked ? '❤️' : '🤍'}</span>
-              )}
-              <span>{likeCount}</span>
-            </button>
-            
-            {/* Reply Button */}
-            <button 
-              onClick={() => setShowReplyForm(!showReplyForm)}
-              className={`text-sm ${themeClasses.mutedForeground} hover:${themeClasses.foreground}`}
-            >
-              {showReplyForm ? 'Cancel' : 'Reply'}
-            </button>
-            
-            {/* Report Button */}
-            <button 
-              onClick={() => setShowReportModal(true)}
-              className={`text-sm ${themeClasses.mutedForeground} hover:text-red-500`}
-            >
-              Report
-            </button>
-
-            {/* Admin Delete Button */}
-            {isAdmin && (
+          <Card.Footer>
+            {/* Comment actions */}
+            <div className="flex items-center gap-4">
+              {/* Like Button */}
               <button 
-                onClick={() => setShowDeleteConfirm(true)}
-                disabled={isDeleting}
-                className={`text-sm ${themeClasses.mutedForeground} hover:text-red-600`}
+                onClick={handleLike}
+                disabled={isLiking || loadingLikeStatus}
+                className={`text-sm flex items-center gap-1 transition-colors ${
+                  isLiked 
+                    ? `${themeClasses.foreground} hover:${themeClasses.foreground}/80` 
+                    : `${themeClasses.mutedForeground} hover:${themeClasses.foreground}`
+                }`}
               >
-                {isDeleting ? 'Deleting...' : 'Delete'}
+                {loadingLikeStatus ? (
+                  <span className="text-lg animate-pulse">🤍</span>
+                ) : (
+                  <span className="text-lg">{isLiked ? '❤️' : '🤍'}</span>
+                )}
+                <span>{likeCount}</span>
               </button>
-            )}
-          </div>
+              
+              {/* Reply Button */}
+              <button 
+                onClick={() => setShowReplyForm(!showReplyForm)}
+                className={`text-sm ${themeClasses.mutedForeground} hover:${themeClasses.foreground}`}
+              >
+                {showReplyForm ? 'Cancel' : 'Reply'}
+              </button>
+              
+              {/* Report Button */}
+              <button 
+                onClick={() => setShowReportModal(true)}
+                className={`text-sm ${themeClasses.mutedForeground} hover:text-red-500`}
+              >
+                Report
+              </button>
+
+              {/* Admin Delete Button */}
+              {isAdmin && (
+                <button 
+                  onClick={() => setShowDeleteConfirm(true)}
+                  disabled={isDeleting}
+                  className={`text-sm ${themeClasses.mutedForeground} hover:text-red-600`}
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete'}
+                </button>
+              )}
+            </div>
+          </Card.Footer>
         </>
       )}
 
@@ -440,14 +447,17 @@ function CommentItem({ comment, poemTitle, onReplyAdded, onCommentDeleted }: Com
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg max-w-md w-full`}>
-            <div className="p-6">
-              <div className="flex items-center gap-2 mb-4">
+          <Card isDarkMode={theme === 'dark'} className="max-w-md w-full">
+            <Card.Header>
+              <div className="flex items-center gap-2">
                 <span className="text-lg">⚠️</span>
                 <h3 className={`text-lg font-semibold ${themeClasses.foreground}`}>
                   Delete Comment
                 </h3>
               </div>
+            </Card.Header>
+            
+            <Card.Content>
               
               <p className={`${themeClasses.foreground} mb-6`}>
                 Are you sure you want to delete this comment by {comment.authorName}? This action cannot be undone.
@@ -480,70 +490,11 @@ function CommentItem({ comment, poemTitle, onReplyAdded, onCommentDeleted }: Com
                   {isDeleting ? 'Deleting...' : 'Delete Comment'}
                 </Button>
               </div>
-            </div>
-          </div>
+            </Card.Content>
+          </Card>
         </div>
       )}
-
-      {/* Report Modal */}
-      <ReportModal
-        comment={comment}
-        isOpen={showReportModal}
-        onClose={() => setShowReportModal(false)}
-        onReported={() => {
-          // Optional: Update UI to show the comment has been reported
-          console.log('Comment reported successfully');
-        }}
-      />
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg max-w-md w-full`}>
-            <div className="p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-lg">⚠️</span>
-                <h3 className={`text-lg font-semibold ${themeClasses.foreground}`}>
-                  Delete Comment
-                </h3>
-              </div>
-              
-              <p className={`${themeClasses.foreground} mb-6`}>
-                Are you sure you want to delete this comment by {comment.authorName}? This action cannot be undone.
-              </p>
-              
-              <div className={`mb-4 p-3 ${themeClasses.muted} rounded border ${themeClasses.border} text-sm`}>
-                {comment.content.length > 100 ? 
-                  `${comment.content.substring(0, 100)}...` : 
-                  comment.content
-                }
-              </div>
-              
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  isDarkMode={theme === 'dark'}
-                  onClick={() => setShowDeleteConfirm(false)}
-                  disabled={isDeleting}
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="primary"
-                  isDarkMode={theme === 'dark'}
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-                >
-                  {isDeleting ? 'Deleting...' : 'Delete Comment'}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    </Card>
   );
 }
 
@@ -691,22 +642,22 @@ function CommentForm({ poemId, poemTitle, parentId, parentComment, onCommentAdde
           </div>
           
           {/* Email field - only for anonymous users */}
-          {isAnonymous && (
-            <div>
-              <label htmlFor="author-email" className={`block text-sm font-medium ${themeClasses.foreground} mb-2`}>
-                Email (optional)
-              </label>
-              <Input
-                id="author-email"
-                type="email"
-                value={authorEmail}
-                onChange={(e) => setAuthorEmail(e.target.value)}
-                placeholder="your@email.com"
-                disabled={isSubmitting}
-                isDarkMode={theme === 'dark'}
-              />
-            </div>
-          )}
+          {/* {isAnonymous && ( */}
+          {/*   <div> */}
+          {/*     <label htmlFor="author-email" className={`block text-sm font-medium ${themeClasses.foreground} mb-2`}> */}
+          {/*       Email (optional) */}
+          {/*     </label> */}
+          {/*     <Input */}
+          {/*       id="author-email" */}
+          {/*       type="email" */}
+          {/*       value={authorEmail} */}
+          {/*       onChange={(e) => setAuthorEmail(e.target.value)} */}
+          {/*       placeholder="your@email.com" */}
+          {/*       disabled={isSubmitting} */}
+          {/*       isDarkMode={theme === 'dark'} */}
+          {/*     /> */}
+          {/*   </div> */}
+          {/* )} */}
         </div>
 
         <div>

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
-import { Button } from '@mond-design-system/theme';
+import { Button, Card } from '@mond-design-system/theme';
 import { formatRelativeTime } from '@/lib/utils';
 import { getActivity, getPoems, getSubscribers, type Activity } from '@/lib/firebaseService';
 
@@ -164,57 +164,62 @@ export default function ActivityPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className={`text-3xl font-bold ${themeClasses.foreground} mb-2`}>
-              Activity
-            </h1>
-            <p className={themeClasses.mutedForeground}>
-              Recent activity and engagement on your poetry platform
-            </p>
-          </div>
-          
-          <Link href="/admin/poems">
-            <Button
-              variant="outline"
-              isDarkMode={theme === 'dark'}
-            >
-              Manage Poems →
-            </Button>
-          </Link>
+    <div className="max-w-6xl mx-auto p-6">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className={`text-3xl font-bold ${themeClasses.foreground} mb-2`}>
+            Activity Dashboard
+          </h1>
+          <p className={themeClasses.mutedForeground}>
+            Recent activity and engagement on your poetry platform
+          </p>
         </div>
 
         {/* Activity Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}>
-            <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
-              {loadingData ? '...' : stats.totalPoems}
-            </div>
-            <div className={`text-sm ${themeClasses.mutedForeground}`}>Published Poems</div>
-          </div>
+          <Card isDarkMode={theme === 'dark'}>
+            <Card.Header>
+              <div className={`text-sm ${themeClasses.mutedForeground}`}>Published Poems</div>
+            </Card.Header>
+            <Card.Content className="p-4">
+              <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
+                {loadingData ? '...' : stats.totalPoems}
+              </div>
+            </Card.Content>
+          </Card>
           
-          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}>
-            <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
-              {loadingData ? '...' : stats.totalLikes}
-            </div>
-            <div className={`text-sm ${themeClasses.mutedForeground}`}>Total Likes</div>
-          </div>
+          <Card isDarkMode={theme === 'dark'}>
+            <Card.Header>
+              <div className={`text-sm ${themeClasses.mutedForeground}`}>Total Likes</div>
+            </Card.Header>
+            <Card.Content className="p-4">
+              <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
+                {loadingData ? '...' : stats.totalLikes}
+              </div>
+            </Card.Content>
+          </Card>
           
-          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}>
-            <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
-              {loadingData ? '...' : stats.totalComments}
-            </div>
-            <div className={`text-sm ${themeClasses.mutedForeground}`}>Total Comments</div>
-          </div>
+          <Card isDarkMode={theme === 'dark'}>
+            <Card.Header>
+              <div className={`text-sm ${themeClasses.mutedForeground}`}>Total Comments</div>
+            </Card.Header>
+            <Card.Content className="p-4">
+              <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
+                {loadingData ? '...' : stats.totalComments}
+              </div>
+            </Card.Content>
+          </Card>
           
-          <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-4`}>
-            <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
-              {loadingData ? '...' : stats.totalSubscribers}
-            </div>
-            <div className={`text-sm ${themeClasses.mutedForeground}`}>Email Subscribers</div>
-          </div>
+          <Card isDarkMode={theme === 'dark'}>
+            <Card.Header>
+              <div className={`text-sm ${themeClasses.mutedForeground}`}>Email Subscribers</div>
+            </Card.Header>
+            <Card.Content className="p-4">
+              <div className={`text-2xl font-bold ${themeClasses.foreground}`}>
+                {loadingData ? '...' : stats.totalSubscribers}
+              </div>
+            </Card.Content>
+          </Card>
         </div>
 
         {/* Activity Feed */}
@@ -225,22 +230,21 @@ export default function ActivityPage() {
             {/* Activity Filter Buttons */}
             <div className="flex flex-wrap gap-2">
               {['all', 'comments', 'poems', 'reports'].map((filter) => (
-                <button
+                <Button
                   key={filter}
+                  variant={activityFilter === filter ? 'primary' : 'outline'}
+                  size="sm"
+                  isDarkMode={theme === 'dark'}
                   onClick={() => setActivityFilter(filter as 'all' | 'comments' | 'poems' | 'reports')}
-                  className={`px-4 py-2 text-sm rounded-lg font-medium transition-colors ${
-                    activityFilter === filter
-                      ? 'bg-primary text-white shadow-md'
-                      : `${themeClasses.muted} ${themeClasses.mutedForeground} hover:${themeClasses.foreground} hover:bg-primary/10 border ${themeClasses.border}`
-                  }`}
+                  className="px-4 py-2 text-sm"
                 >
                   {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                  {filter === 'reports' && activities.filter(a => a.type === 'comment_reported').length > 0 && (
-                    <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                      {activities.filter(a => a.type === 'comment_reported').length}
-                    </span>
-                  )}
-                </button>
+                  {/* {filter === 'reports' && activities.filter(a => a.type === 'comment_reported').length > 0 && ( */}
+                  {/*   <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full"> */}
+                  {/*     {activities.filter(a => a.type === 'comment_reported').length} */}
+                  {/*   </span> */}
+                  {/* )} */}
+                </Button>
               ))}
             </div>
           </div>
@@ -267,35 +271,33 @@ export default function ActivityPage() {
           ) : (
             <div className="space-y-3">
               {filteredActivities.slice(0, 50).map((activity) => (
-                <div
-                  key={activity.id}
-                  className={`flex items-start gap-4 p-4 ${themeClasses.card} border ${themeClasses.border} rounded-lg hover:shadow-sm transition-shadow`}
-                >
-                  <div className="flex-shrink-0 text-2xl">
-                    {getActivityIcon(activity.type)}
-                  </div>
+                <Card key={activity.id} isDarkMode={theme === 'dark'} className="hover:shadow-sm transition-shadow">
+                  <Card.Header>
+                  </Card.Header>
                   
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <h3 className={`text-sm font-medium ${themeClasses.foreground}`}>
-                        {getActivityDescription(activity)}
-                      </h3>
-                      <span className={`text-xs ${themeClasses.mutedForeground}`}>
-                        {formatRelativeTime(activity.timestamp)}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    corners="rounded"
-                    isDarkMode={theme === 'dark'}
-                    className="px-2 py-1 text-xs pointer-events-none"
-                  >
-                    {activity.type.replace('_', ' ')}
-                  </Button>
-                </div>
+                  <Card.Content className="p-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className={`text-sm font-medium ${themeClasses.foreground} `}>
+                          {getActivityDescription(activity)}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs ${themeClasses.mutedForeground}`}>
+                            {formatRelativeTime(activity.timestamp)}
+                          </span>
+                          {/* <span className="text-lg">{getActivityIcon(activity.type)}</span> */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            corners="rounded"
+                            isDarkMode={theme === 'dark'}
+                            className="px-2 py-1 text-xs pointer-events-none"
+                          >
+                            {activity.type.replace('_', ' ')}
+                          </Button>
+                        </div>
+                      </div>
+                  </Card.Content>
+                </Card>
               ))}
             </div>
           )}

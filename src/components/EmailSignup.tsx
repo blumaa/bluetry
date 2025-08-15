@@ -1,19 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
+import { useToast } from '@/contexts/ToastContext';
 import { Button, Input } from '@mond-design-system/theme';
+import { addSubscriber } from '@/lib/firebaseService';
 
 export function EmailSignup() {
   const { theme } = useTheme();
   const themeClasses = useThemeClasses();
+  const { success, error } = useToast();
   const [email, setEmail] = useState('');
   const [isSubscribing, setIsSubscribing] = useState(false);
-  const [message, setMessage] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,43 +20,22 @@ export function EmailSignup() {
     if (!email || isSubscribing) return;
     
     setIsSubscribing(true);
-    setMessage('');
     
     try {
-      // Check if email already exists
-      const q = query(
-        collection(db, 'subscribers'),
-        where('email', '==', email.toLowerCase())
-      );
-      const querySnapshot = await getDocs(q);
+      // Use the proper service function
+      await addSubscriber(email);
       
-      if (!querySnapshot.empty) {
-        setMessage('This email is already subscribed!');
-        setIsSuccess(false);
+      success('Successfully subscribed to newsletter!');
+      setEmail('');
+    } catch (errorObj) {
+      console.error('Error subscribing:', errorObj);
+      if (errorObj instanceof Error && errorObj.message === 'Email already subscribed') {
+        error('This email is already subscribed!');
       } else {
-        // Add new subscriber
-        await addDoc(collection(db, 'subscribers'), {
-          email: email.toLowerCase(),
-          subscribed: true,
-          createdAt: new Date(),
-        });
-        
-        setMessage('Subscribed');
-        setIsSuccess(true);
-        setEmail('');
+        error('Something went wrong. Please try again.');
       }
-    } catch (error) {
-      console.error('Error subscribing:', error);
-      setMessage('Something went wrong. Please try again.');
-      setIsSuccess(false);
     } finally {
       setIsSubscribing(false);
-      
-      // Clear message after 5 seconds
-      setTimeout(() => {
-        setMessage('');
-        setIsSuccess(false);
-      }, 5000);
     }
   };
 
@@ -96,16 +74,6 @@ export function EmailSignup() {
         >
           {isSubscribing ? 'Subscribing...' : 'Subscribe'}
         </Button>
-        
-        {message && (
-          <div className={`text-sm p-3 rounded-md ${
-            isSuccess 
-              ? 'bg-primary/10 text-primary border border-primary/20' 
-              : `${themeClasses.muted} ${themeClasses.mutedForeground} border ${themeClasses.border}`
-          }`}>
-            {message}
-          </div>
-        )}
       </form>
     </div>
   );

@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
-import { Button } from '@mond-design-system/theme';
+import { Button, Card } from '@mond-design-system/theme';
 
 import { Comment } from '@/types';
 
@@ -41,15 +40,17 @@ export function ReportModal({ comment, isOpen, onClose, onReported }: ReportModa
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg max-w-md w-full`}>
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex items-center gap-2 mb-4">
+      <Card isDarkMode={theme === 'dark'} className="max-w-md w-full">
+        <Card.Header>
+          <div className="flex items-center gap-2">
             <span className="text-lg">⚠️</span>
             <h3 className={`text-lg font-semibold ${themeClasses.foreground}`}>
               Report Comment
             </h3>
           </div>
+        </Card.Header>
+        
+        <Card.Content>
           
           {/* Message */}
           <p className={`${themeClasses.foreground} mb-6`}>
@@ -85,8 +86,8 @@ export function ReportModal({ comment, isOpen, onClose, onReported }: ReportModa
               {isSubmitting ? 'Reporting...' : 'Yes, Report'}
             </Button>
           </div>
-        </div>
-      </div>
+        </Card.Content>
+      </Card>
     </div>
   );
 }

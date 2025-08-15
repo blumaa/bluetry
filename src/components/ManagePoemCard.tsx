@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
-import { Button } from '@mond-design-system/theme';
+import { Button, Card } from '@mond-design-system/theme';
 import { formatRelativeTime, getPoemUrl } from '@/lib/utils';
 import { Poem } from '@/types';
 
@@ -29,21 +29,24 @@ export function ManagePoemCard({
   const themeClasses = useThemeClasses();
 
   return (
-    <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-6 hover:shadow-sm transition-shadow`}>
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1 min-w-0">
-          <Link href={getPoemUrl(poem)} className="group">
-            <h3 className={`text-lg font-semibold ${themeClasses.foreground} group-hover:text-primary transition-colors cursor-pointer`}>
-              {poem.title}
-            </h3>
-          </Link>
-          <p className={`text-sm ${themeClasses.mutedForeground} mt-1 truncate`}>
-            {poem.content.replace(/<[^>]*>/g, '').substring(0, 100)}...
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-2 ml-4">
+    <Card 
+      isDarkMode={theme === 'dark'}
+      className="hover:shadow-sm transition-shadow"
+    >
+      <Card.Header>
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0">
+            <Link href={getPoemUrl(poem)} className="group">
+              <Card.Title as="h3" className="text-lg font-semibold group-hover:text-primary transition-colors cursor-pointer">
+                {poem.title}
+              </Card.Title>
+            </Link>
+            <Card.Subtitle className={`text-sm ${themeClasses.mutedForeground} mt-1 truncate`}>
+              {poem.content.replace(/<[^>]*>/g, '').substring(0, 100)}...
+            </Card.Subtitle>
+          </div>
+          
+          <div className="flex items-center gap-2 ml-4">
           <Button
             variant={poem.published ? "primary" : "ghost"}
             size="sm"
@@ -65,19 +68,23 @@ export function ManagePoemCard({
             </Button>
           )}
         </div>
-      </div>
+        </div>
+      </Card.Header>
 
-      {/* Stats */}
-      <div className={`flex items-center gap-4 text-sm ${themeClasses.mutedForeground} mb-4`}>
+      <Card.Content>
+        {/* Stats */}
+        <div className={`flex items-center gap-4 text-sm ${themeClasses.mutedForeground}`}>
         <span>Created {formatRelativeTime(poem.createdAt)}</span>
         <span>•</span>
         <span>{poem.likeCount || 0} likes</span>
         <span>•</span>
         <span>{poem.commentCount || 0} comments</span>
-      </div>
+        </div>
+      </Card.Content>
 
-      {/* Actions */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <Card.Footer>
+        {/* Actions */}
+        <div className="flex items-center gap-2 flex-wrap">
         <Link href={`/create?edit=${poem.id}`}>
           <Button 
             variant="ghost" 
@@ -123,7 +130,8 @@ export function ManagePoemCard({
         >
           {isDeleting ? '⏳' : '🗑️'} Delete
         </Button>
-      </div>
-    </div>
+        </div>
+      </Card.Footer>
+    </Card>
   );
 }

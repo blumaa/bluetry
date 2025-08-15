@@ -7,17 +7,18 @@ import { auth } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
-import { Button, Input } from '@mond-design-system/theme';
+import { useToast } from '@/contexts/ToastContext';
+import { Button, Card, Input } from '@mond-design-system/theme';
 
 export default function LoginPage() {
   const router = useRouter();
   const { theme } = useTheme();
   const themeClasses = useThemeClasses();
   const { currentUser, loading } = useAuth();
+  const { error: showError } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
   // Clear any existing mock authentication
   useEffect(() => {
@@ -36,7 +37,6 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
@@ -60,7 +60,7 @@ export default function LoginPage() {
         }
       }
       
-      setError(errorMessage);
+      showError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +69,16 @@ export default function LoginPage() {
   return (
     <div className={`min-h-screen flex items-center justify-center ${themeClasses.background}`}>
       <div className="max-w-md w-full mx-4">
-        <div className={`${themeClasses.card} border ${themeClasses.border} rounded-lg p-8 shadow-lg`}>
+        <Card isDarkMode={theme === 'dark'} className="shadow-lg">
+          <Card.Header>
+            <div className="text-center">
+              <h1 className={`text-3xl font-bold ${themeClasses.foreground} mb-2`}>
+                Welcome Back
+              </h1>
+            </div>
+          </Card.Header>
+          
+          <Card.Content className="p-8">
           {/* Header */}
           {/* <div className="text-center mb-8"> */}
           {/*   <h1 className="text-3xl font-bold text-foreground mb-2"> */}
@@ -111,12 +120,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {error && (
-              <div className={`${themeClasses.muted} ${themeClasses.mutedForeground} border ${themeClasses.border} rounded-md p-3 text-sm`}>
-                {error}
-              </div>
-            )}
-
             <Button
               type="submit"
               variant="primary"
@@ -153,7 +156,8 @@ export default function LoginPage() {
               ← Back to poems
             </Button>
           </div>
-        </div>
+          </Card.Content>
+        </Card>
       </div>
     </div>
   );

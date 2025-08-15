@@ -513,25 +513,102 @@ export async function addSubscriber(email: string): Promise<void> {
 
 export async function getSubscribers(): Promise<Array<{ id: string; email: string; subscribed: boolean; createdAt: Date }>> {
   try {
-    const q = query(collection(db, 'subscribers'), orderBy('createdAt', 'desc'));
+    // Remove orderBy to avoid issues with mixed timestamp formats
+    const q = query(collection(db, 'subscribers'));
     const querySnapshot = await getDocs(q);
     
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      email: doc.data().email,
-      subscribed: doc.data().subscribed,
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-    }));
+    const subscribers = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        email: data.email,
+        subscribed: data.subscribed ?? true, // Default to true if not set
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt) || new Date(),
+      };
+    });
+    
+    // Sort in memory by createdAt (most recent first)
+    subscribers.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    
+    return subscribers;
   } catch (error) {
     console.error('Error fetching subscribers:', error);
     return [];
   }
 }
 
+export async function updateSubscriber(subscriberId: string, updates: { email?: string; subscribed?: boolean }): Promise<void> {
+  try {
+    const subscriberRef = doc(db, 'subscribers', subscriberId);
+    await updateDoc(subscriberRef, {
+      ...updates,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error('Error updating subscriber:', error);
+    throw error;
+  }
+}
+
+export async function deleteSubscriber(subscriberId: string): Promise<void> {
+  try {
+    const subscriberRef = doc(db, 'subscribers', subscriberId);
+    await deleteDoc(subscriberRef);
+  } catch (error) {
+    console.error('Error deleting subscriber:', error);
+    throw error;
+  }
+}
+
+export async function sendEmailToAllSubscribers(subject: string, message: string): Promise<{ sent: number; failed: number }> {
+  try {
+    // First get all active subscribers from the client side
+    const allSubscribers = await getSubscribers();
+    const activeSubscribers = allSubscribers.filter(sub => sub.subscribed);
+
+    if (activeSubscribers.length === 0) {
+      throw new Error('No active subscribers found');
+    }
+
+    const response = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        subject, 
+        message, 
+        subscribers: activeSubscribers 
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to send email');
+    }
+
+    // Log activity for successful sends
+    if (result.sent > 0) {
+      await logActivity('subscriber_email_sent', 'admin', null, { 
+        subject, 
+        message, 
+        sent: result.sent, 
+        failed: result.failed 
+      });
+    }
+
+    return { sent: result.sent, failed: result.failed };
+  } catch (error) {
+    console.error('Error sending email to subscribers:', error);
+    throw error;
+  }
+}
+
 // ==================== ACTIVITY ====================
 
 export interface ActivityData {
-  type: 'poem_created' | 'poem_published' | 'poem_liked' | 'comment_added' | 'comment_liked' | 'comment_replied' | 'comment_reported' | 'comment_deleted' | 'subscriber_joined';
+  type: 'poem_created' | 'poem_published' | 'poem_liked' | 'comment_added' | 'comment_liked' | 'comment_replied' | 'comment_reported' | 'comment_deleted' | 'subscriber_joined' | 'subscriber_email_sent';
   userId: string;
   poemId?: string | null;
   commentId?: string | null;    // For comment-related activities

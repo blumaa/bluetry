@@ -63,6 +63,11 @@ export function Header() {
                           Activity
                         </Button>
                       </Link>
+                      <Link href="/admin/subscribers">
+                        <Button variant="ghost" size="sm" isDarkMode={theme === 'dark'}>
+                          Subscribers
+                        </Button>
+                      </Link>
                     </>
                   )}
                   <div className="flex items-center space-x-2">

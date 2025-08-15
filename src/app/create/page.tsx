@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
+import { useToast } from '@/contexts/ToastContext';
 import { Button, Input } from '@mond-design-system/theme';
 import { PoemCard } from '@/components/PoemCard';
 import { Poem } from '@/types';
@@ -19,13 +20,10 @@ function CreatePageContent() {
   const { theme } = useTheme();
   const themeClasses = useThemeClasses();
   const { currentUser, loading } = useAuth();
+  const { success, error } = useToast();
   const [saving, setSaving] = useState(false);
   const [loadingPoem, setLoadingPoem] = useState(false);
   const [selectedPoem, setSelectedPoem] = useState<Poem | null>(null);
-  const [notification, setNotification] = useState<{
-    message: string;
-    type: 'success' | 'error';
-  } | null>(null);
 
   // Edit mode detection
   const editPoemId = searchParams.get('edit');
@@ -71,17 +69,11 @@ function CreatePageContent() {
           updatedAt: poem.updatedAt,
         });
       } else {
-        setNotification({
-          message: 'Poem not found',
-          type: 'error',
-        });
+        error('Poem not found');
       }
-    } catch (error) {
-      console.error('Error loading poem:', error);
-      setNotification({
-        message: 'Error loading poem for editing',
-        type: 'error',
-      });
+    } catch (errorObj) {
+      console.error('Error loading poem:', errorObj);
+      error('Error loading poem for editing');
     } finally {
       setLoadingPoem(false);
     }
@@ -91,18 +83,12 @@ function CreatePageContent() {
     e.preventDefault();
 
     if (!currentUser) {
-      setNotification({
-        message: `You must be logged in to ${isEditMode ? 'edit' : 'create'} poems`,
-        type: 'error',
-      });
+      error(`You must be logged in to ${isEditMode ? 'edit' : 'create'} poems`);
       return;
     }
 
     if (!title.trim() || !content.trim()) {
-      setNotification({
-        message: 'Please fill in both title and content',
-        type: 'error',
-      });
+      error('Please fill in both title and content');
       return;
     }
 
@@ -139,21 +125,15 @@ function CreatePageContent() {
         setIsPinned(false);
       }
 
-      setNotification({
-        message: `Poem ${isEditMode ? 'updated' : 'saved'} successfully!`,
-        type: 'success',
-      });
+      success(`Poem ${isEditMode ? 'updated' : 'saved'} successfully!`);
 
       // Redirect after showing success message
       setTimeout(() => {
         router.push(isEditMode ? '/admin/poems' : '/');
       }, 1500);
-    } catch (error) {
-      console.error('Error saving poem:', error);
-      setNotification({
-        message: 'Error saving poem. Please try again.',
-        type: 'error',
-      });
+    } catch (errorObj) {
+      console.error('Error saving poem:', errorObj);
+      error('Error saving poem. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -161,9 +141,8 @@ function CreatePageContent() {
 
   const handleCancel = () => {
     if (title || content) {
-      if (confirm('Are you sure you want to discard your changes?')) {
-        router.push(isEditMode ? '/admin/poems' : '/');
-      }
+      // For now, just navigate - we could add a modal confirmation later
+      router.push(isEditMode ? '/admin/poems' : '/');
     } else {
       router.push(isEditMode ? '/admin/poems' : '/');
     }
@@ -184,19 +163,6 @@ function CreatePageContent() {
   return (
     <div className={`min-h-screen ${themeClasses.background}`}>
       <div className="max-w-4xl mx-auto p-6">
-        {/* Notification */}
-        {notification && (
-          <div
-            className={`mb-6 p-4 rounded-lg border ${
-              notification.type === 'success'
-                ? 'bg-primary/10 text-primary border-primary/20'
-                : `${themeClasses.muted} ${themeClasses.mutedForeground} border ${themeClasses.border}`
-            }`}
-          >
-            {notification.message}
-          </div>
-        )}
-
         <form onSubmit={handleSave} className="space-y-8">
           {/* Header */}
           <div className="flex items-center justify-between">
