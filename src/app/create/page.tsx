@@ -281,7 +281,6 @@ function CreatePageContent() {
                 pinned: isPinned,
                 likeCount: selectedPoem?.likeCount || 0,
                 commentCount: selectedPoem?.commentCount || 0,
-                viewCount: selectedPoem?.viewCount || 0,
                 createdAt: selectedPoem?.createdAt || new Date(),
                 updatedAt: selectedPoem?.updatedAt || new Date(),
               }} />
