@@ -269,11 +269,22 @@ function CreatePageContent() {
           </div>
 
           {/* Preview */}
-
-          {content && (
+          {(title || content) && (
             <div className="border-t pt-8">
               <h3 className={`text-lg font-semibold ${themeClasses.foreground} mb-4`}>Preview</h3>
-              {selectedPoem && <PoemCard poem={{...selectedPoem, content, title}} />}
+              <PoemCard poem={{
+                id: isEditMode ? (selectedPoem?.id || 'preview') : 'preview',
+                title: title || 'Untitled Poem',
+                content: content || '',
+                authorId: currentUser?.id || '',
+                published: isPublished,
+                pinned: isPinned,
+                likeCount: selectedPoem?.likeCount || 0,
+                commentCount: selectedPoem?.commentCount || 0,
+                viewCount: selectedPoem?.viewCount || 0,
+                createdAt: selectedPoem?.createdAt || new Date(),
+                updatedAt: selectedPoem?.updatedAt || new Date(),
+              }} />
             </div>
           )}
         </form>

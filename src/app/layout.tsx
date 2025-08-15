@@ -7,6 +7,7 @@ import { UIProvider } from '@/contexts/UIContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { LayoutWrapper } from '@/components/LayoutWrapper';
 import { ToastContainer } from '@/components/ui/ToastContainer';
+import { Analytics } from '@vercel/analytics/next';
 
 const dmSans = DM_Sans({
   variable: '--font-dm-sans',
@@ -45,6 +46,7 @@ export default function RootLayout({
                   {children}
                 </LayoutWrapper>
                 <ToastContainer />
+                <Analytics />
               </ToastProvider>
             </UIProvider>
           </AuthProvider>
