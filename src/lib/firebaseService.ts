@@ -753,7 +753,8 @@ export function listenToComments(poemId: string, callback: (comments: Comment[])
 
 // ==================== COMMENT LIKES ====================
 
-export async function likeComment(commentId: string, userId: string | null, sessionId: string | null): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function likeComment(_: string, __: string | null, ___: string | null): Promise<void> {
   try {
     // Simulate successful like - UI handles optimistic updates
     return Promise.resolve();
@@ -763,7 +764,8 @@ export async function likeComment(commentId: string, userId: string | null, sess
   }
 }
 
-export async function unlikeComment(commentId: string, userId: string | null, sessionId: string | null): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function unlikeComment(_: string, __: string | null, ___: string | null): Promise<void> {
   try {
     // For now, just log the unlike locally to avoid Firebase permission issues  
     // The UI will handle optimistic updates
@@ -776,7 +778,8 @@ export async function unlikeComment(commentId: string, userId: string | null, se
   }
 }
 
-export async function isCommentLikedByUser(commentId: string, userId: string | null, sessionId: string | null): Promise<boolean> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function isCommentLikedByUser(_: string, __: string | null, ___: string | null): Promise<boolean> {
   try {
     // For now, return false to avoid Firebase permission issues
     // The UI will manage like state locally through optimistic updates
@@ -804,7 +807,7 @@ export async function reportComment(reportData: Omit<CommentReport, 'id' | 'crea
         isReported: true,
         reportCount: increment(1),
       });
-    } catch (error) {
+    } catch {
       // Silently ignore permission errors - the report record was still created
       // This is expected for anonymous users who can't update comment fields
     }
@@ -816,7 +819,7 @@ export async function reportComment(reportData: Omit<CommentReport, 'id' | 'crea
           commentId: reportData.commentId,
           reason: reportData.reason
         });
-      } catch (error) {
+      } catch {
         // Ignore activity logging errors
       }
     }

@@ -23,10 +23,6 @@ export function BotCheck({ sessionId, onSuccess, onError }: BotCheckProps) {
   const [error, setError] = useState<string | null>(null);
   const [attempts, setAttempts] = useState(0);
 
-  useEffect(() => {
-    initializeBotCheck();
-  }, [sessionId]);
-
   const initializeBotCheck = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -42,6 +38,10 @@ export function BotCheck({ sessionId, onSuccess, onError }: BotCheckProps) {
       setIsLoading(false);
     }
   }, [sessionId, onError]);
+
+  useEffect(() => {
+    initializeBotCheck();
+  }, [sessionId, initializeBotCheck]);
 
   const handleSubmit = async () => {
     if (!answer.trim() || !botCheck) return;

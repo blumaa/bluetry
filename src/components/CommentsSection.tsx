@@ -22,9 +22,7 @@ interface CommentsSectionProps {
 }
 
 export function CommentsSection({ poemId, poemTitle, initialCommentCount = 0, isExpanded: externalIsExpanded, onToggle }: CommentsSectionProps) {
-  const { theme } = useTheme();
   const themeClasses = useThemeClasses();
-  const { currentUser } = useAuth();
   const [internalIsExpanded, setInternalIsExpanded] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [replies, setReplies] = useState<Comment[]>([]);

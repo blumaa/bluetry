@@ -123,3 +123,4 @@
 
 
 
+set up optin opt out user notificationt o receive an email every time a poem is published with the poem.

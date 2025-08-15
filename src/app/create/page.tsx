@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -35,19 +35,7 @@ function CreatePageContent() {
   const [isPublished, setIsPublished] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
 
-  useEffect(() => {
-    if (!loading) {
-      if (!currentUser) {
-        router.push('/login');
-      } else if (!currentUser.isAdmin) {
-        router.push('/');
-      } else if (isEditMode && editPoemId) {
-        loadPoemForEditing(editPoemId);
-      }
-    }
-  }, [currentUser, loading, router, isEditMode, editPoemId]);
-
-  const loadPoemForEditing = async (poemId: string) => {
+  const loadPoemForEditing = useCallback(async (poemId: string) => {
     try {
       setLoadingPoem(true);
       const poem = await getPoemById(poemId);
@@ -77,7 +65,19 @@ function CreatePageContent() {
     } finally {
       setLoadingPoem(false);
     }
-  };
+  }, [error]);
+
+  useEffect(() => {
+    if (!loading) {
+      if (!currentUser) {
+        router.push('/login');
+      } else if (!currentUser.isAdmin) {
+        router.push('/');
+      } else if (isEditMode && editPoemId) {
+        loadPoemForEditing(editPoemId);
+      }
+    }
+  }, [currentUser, loading, router, isEditMode, editPoemId, loadPoemForEditing]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
@@ -85,29 +84,6 @@ export default function ActivityPage() {
     }
   });
 
-  const getActivityIcon = (type: Activity['type']) => {
-    switch (type) {
-      case 'poem_created':
-      case 'poem_published':
-        return '📝';
-      case 'poem_liked':
-        return '❤️';
-      case 'comment_added':
-        return '💬';
-      case 'comment_liked':
-        return '❤️';
-      case 'comment_replied':
-        return '↩️';
-      case 'comment_reported':
-        return '⚠️';
-      case 'comment_deleted':
-        return '🗑️';
-      case 'subscriber_joined':
-        return '📬';
-      default:
-        return '📊';
-    }
-  };
 
   // Removed getActivityColor function - now using consistent primary Button styling
 
