@@ -7,6 +7,7 @@ import { useUI } from '@/contexts/UIContext';
 import { useThemeClasses } from '@/hooks/useDesignTokens';
 import { Button } from '@mond-design-system/theme';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import Image from 'next/image';
 
 export function Header() {
   const { currentUser, loading, logout } = useAuth();
@@ -36,6 +37,13 @@ export function Header() {
           </Button>
           <Link href="/" className="flex items-center space-x-2" onClick={handleHomeClick}>
             <span className={`text-2xl font-bold ${themeClasses.foreground}`}>bluetry</span>
+            <Image 
+              src="/blue-tree.svg" 
+              alt="Bluetry Logo" 
+              width={28} 
+              height={28} 
+              className="flex-shrink-0"
+            />
           </Link>
         </div>
 

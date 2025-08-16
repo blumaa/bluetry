@@ -149,7 +149,7 @@ export function PoemCard({ poem }: PoemCardProps) {
       <Card.Content>
         <div className="poem-content">
           <div 
-            className={`leading-relaxed prose prose-lg max-w-none prose-p:my-2 prose-headings:my-2 ${themeClasses.conditional('[&_*]:!text-[#414A4C]', '[&_*]:!text-[#DDE6ED]')}`}
+            className={`leading-relaxed prose prose-lg max-w-none prose-p:my-2 prose-headings:my-2 whitespace-pre-wrap ${themeClasses.conditional('[&_*]:!text-[#414A4C]', '[&_*]:!text-[#DDE6ED]')}`}
             dangerouslySetInnerHTML={{ __html: displayContent }}
           />
         </div>

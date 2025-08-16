@@ -10,7 +10,7 @@ import { Button, Input } from '@mond-design-system/theme';
 import { PoemCard } from '@/components/PoemCard';
 import { Poem } from '@/types';
 import { TiptapEditor } from '@/components/TiptapEditor';
-import { createPoem, updatePoem, getPoemById } from '@/lib/firebaseService';
+import { createPoem, updatePoem, getPoemById, getSubscribers } from '@/lib/firebaseService';
 
 // Removed unused User interface
 
@@ -34,6 +34,7 @@ function CreatePageContent() {
   const [content, setContent] = useState('');
   const [isPublished, setIsPublished] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
+  const [sendEmail, setSendEmail] = useState(false);
 
   const loadPoemForEditing = useCallback(async (poemId: string) => {
     try {
@@ -44,6 +45,7 @@ function CreatePageContent() {
         setContent(poem.content);
         setIsPublished(poem.published);
         setIsPinned(poem.pinned);
+        setSendEmail(false); // Reset for existing poems
         setSelectedPoem({
           id: poemId,
           title: poem.title,
@@ -117,15 +119,50 @@ function CreatePageContent() {
         });
       }
 
+      // Send email to subscribers if checkbox is checked and poem is published
+      if (isPublished && sendEmail) {
+        try {
+          const subscribers = await getSubscribers();
+          if (subscribers && subscribers.length > 0) {
+            const emailResponse = await fetch('/api/send-email', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                subject: `New poem: ${title.trim()}`,
+                message: `A new poem has been published on bluetry!\n\n"${title.trim()}"\n\n${content.replace(/<[^>]*>/g, '')}\n\nRead the full poem and more at ${window.location.origin}`,
+                subscribers: subscribers,
+              }),
+            });
+
+            const emailResult = await emailResponse.json();
+            if (emailResult.success) {
+              success(`Poem ${isEditMode ? 'updated' : 'saved'} and email sent to ${emailResult.sent} subscribers!`);
+            } else {
+              success(`Poem ${isEditMode ? 'updated' : 'saved'} successfully!`);
+              error(`Failed to send email: ${emailResult.error}`);
+            }
+          } else {
+            success(`Poem ${isEditMode ? 'updated' : 'saved'} successfully! No subscribers to email.`);
+          }
+        } catch (emailError) {
+          console.error('Error sending email:', emailError);
+          success(`Poem ${isEditMode ? 'updated' : 'saved'} successfully!`);
+          error('Failed to send email to subscribers.');
+        }
+      } else {
+        success(`Poem ${isEditMode ? 'updated' : 'saved'} successfully!`);
+      }
+
       if (!isEditMode) {
         // Reset form only for new poems
         setTitle('');
         setContent('');
         setIsPublished(false);
         setIsPinned(false);
+        setSendEmail(false);
       }
-
-      success(`Poem ${isEditMode ? 'updated' : 'saved'} successfully!`);
 
       // Redirect after showing success message
       setTimeout(() => {
@@ -231,40 +268,50 @@ function CreatePageContent() {
             </div>
 
             {/* Options */}
-            <div className="flex flex-wrap gap-6">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <Input
-                  id="publish-checkbox"
-                  type="checkbox"
-                  checked={isPublished}
-                  onChange={(e) => setIsPublished(e.target.checked)}
-                  disabled={saving}
-                  isDarkMode={theme === 'dark'}
-                  className="w-4 h-4"
-                />
-                <span className={`text-sm font-medium ${themeClasses.foreground}`}>
-                  Publish immediately
-                </span>
-              </label>
+            <div className="flex gap-3 items-center ">
+              <Input
+                id="publish-checkbox"
+                type="checkbox"
+                checked={isPublished}
+                onChange={(e) => setIsPublished(e.target.checked)}
+                disabled={saving}
+                isDarkMode={theme === 'dark'}
+              />
+              <span className={`text-sm font-medium ${themeClasses.foreground}`}>
+                Publish immediately
+              </span>
 
-              <label className="flex items-center gap-3 cursor-pointer">
-                <Input
-                  id="pin-checkbox"
-                  type="checkbox"
-                  checked={isPinned}
-                  onChange={(e) => setIsPinned(e.target.checked)}
-                  disabled={saving || !isPublished}
-                  isDarkMode={theme === 'dark'}
-                  className="w-4 h-4"
-                />
-                <span
-                  className={`text-sm font-medium ${
-                    isPublished ? themeClasses.foreground : themeClasses.mutedForeground
-                  }`}
-                >
-                  Pin to top (only published poems can be pinned)
-                </span>
-              </label>
+              <Input
+                id="pin-checkbox"
+                type="checkbox"
+                checked={isPinned}
+                onChange={(e) => setIsPinned(e.target.checked)}
+                disabled={saving || !isPublished}
+                isDarkMode={theme === 'dark'}
+              />
+              <span
+                className={`text-sm font-medium ${
+                  isPublished ? themeClasses.foreground : themeClasses.mutedForeground
+                }`}
+              >
+                Pin
+              </span>
+
+              <Input
+                id="email-checkbox"
+                type="checkbox"
+                checked={sendEmail}
+                onChange={(e) => setSendEmail(e.target.checked)}
+                disabled={saving || !isPublished}
+                isDarkMode={theme === 'dark'}
+              />
+              <span
+                className={`text-sm font-medium ${
+                  isPublished ? themeClasses.foreground : themeClasses.mutedForeground
+                }`}
+              >
+                Send poem to subscribers via email
+              </span>
             </div>
           </div>
 

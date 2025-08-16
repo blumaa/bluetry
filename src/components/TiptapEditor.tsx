@@ -26,6 +26,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
         paragraph: {
           HTMLAttributes: {
             class: 'my-0',
+            style: 'white-space: pre-wrap;',
           },
         },
       }),
@@ -43,7 +44,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-lg max-w-none focus:outline-none min-h-[300px] p-4',
+        class: 'prose prose-lg max-w-none focus:outline-none min-h-[300px] p-4 whitespace-pre-wrap',
       },
     },
     parseOptions: {
@@ -216,7 +217,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Start writing y
       <div className="relative">
         <EditorContent 
           editor={editor} 
-          className={`leading-relaxed prose prose-lg max-w-none prose-p:my-2 prose-headings:my-2 ${themeClasses.conditional('[&_*]:!text-[#414A4C]', '[&_*]:!text-[#DDE6ED]')}`}
+          className={`leading-relaxed prose prose-lg max-w-none prose-p:my-2 prose-headings:my-2 whitespace-pre-wrap ${themeClasses.conditional('[&_*]:!text-[#414A4C]', '[&_*]:!text-[#DDE6ED]')}`}
         />
         {editor.isEmpty && (
           <div className={`absolute top-4 left-4 ${themeClasses.mutedForeground} pointer-events-none`}>
