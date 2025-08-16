@@ -29,8 +29,8 @@ export default function LoginPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (!loading && currentUser) {
-      // Redirect admin users to activity, regular users to home
-      router.push(currentUser.isAdmin ? '/activity' : '/');
+      // Redirect admin users to admin dashboard, regular users to home
+      router.push(currentUser.isAdmin ? '/admin' : '/');
     }
   }, [currentUser, loading, router]);
 

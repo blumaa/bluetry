@@ -79,9 +79,11 @@ export function Header() {
                     </>
                   )}
                   <div className="flex items-center space-x-2">
-                    <span className={`text-sm ${themeClasses.mutedForeground}`}>
-                      {currentUser.displayName}
-                    </span>
+                    <Link href="/admin">
+                      <span className={`text-sm ${themeClasses.mutedForeground} hover:${themeClasses.foreground} transition-colors cursor-pointer`}>
+                        {currentUser.displayName}
+                      </span>
+                    </Link>
                     <Button variant="ghost" size="sm" isDarkMode={theme === 'dark'} onClick={logout}>
                       Logout
                     </Button>

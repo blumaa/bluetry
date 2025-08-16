@@ -347,17 +347,15 @@ export default function AdminPage() {
                 {/* Activity Filter */}
                 <div className="flex flex-wrap gap-2">
                   {['all', 'comments', 'poems', 'reports'].map((filter) => (
-                    <button
+                    <Button
                       key={filter}
+                      variant={activityFilter === filter ? 'primary' : 'outline'}
+                      size="sm"
+                      isDarkMode={theme === 'dark'}
                       onClick={() => setActivityFilter(filter as 'all' | 'comments' | 'poems' | 'reports')}
-                      className={`px-4 py-2 text-sm rounded-lg font-medium transition-colors ${
-                        activityFilter === filter
-                          ? 'bg-primary text-white shadow-md'
-                          : `${themeClasses.muted} ${themeClasses.mutedForeground} hover:${themeClasses.foreground} hover:bg-primary/10 border ${themeClasses.border}`
-                      }`}
                     >
                       {filter.charAt(0).toUpperCase() + filter.slice(1)}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -410,14 +408,11 @@ export default function AdminPage() {
             </Link>
           </div>
           
-          <Card isDarkMode={theme === 'dark'}>
-            <Card.Header>
-              <h2 className={`text-xl font-semibold ${themeClasses.foreground}`}>Recent Poems</h2>
-            </Card.Header>
-            <Card.Content>
-              <div className="space-y-4">
-                {poemsToUse.slice(0, 5).map((poem) => (
-                  <div key={poem.id} className={`flex items-center justify-between py-2 border-b ${themeClasses.border} last:border-b-0`}>
+          <div className="space-y-4">
+            {poemsToUse.slice(0, 5).map((poem) => (
+              <Card key={poem.id} isDarkMode={theme === 'dark'}>
+                <Card.Content>
+                  <div className="flex items-center justify-between">
                     <div>
                       <h3 className={`font-medium ${themeClasses.foreground}`}>{poem.title}</h3>
                       <p className={`text-sm ${themeClasses.mutedForeground}`}>
@@ -425,20 +420,24 @@ export default function AdminPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {poem.pinned && <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">Pinned</span>}
+                      {poem.pinned && (
+                        <span className={`text-xs px-2 py-1 rounded-full ${themeClasses.conditional('bg-primary-100 text-primary-600', 'bg-primary-900/20 text-primary-400')}`}>
+                          📌 Pinned
+                        </span>
+                      )}
                       <span className={`text-xs px-2 py-1 rounded ${
                         poem.published 
-                          ? 'bg-primary/10 text-primary' 
-                          : `${themeClasses.muted} ${themeClasses.mutedForeground}`
+                          ? themeClasses.conditional('bg-green-100 text-green-600', 'bg-green-900/20 text-green-400')
+                          : themeClasses.conditional('bg-yellow-100 text-yellow-600', 'bg-yellow-900/20 text-yellow-400')
                       }`}>
                         {poem.published ? 'Published' : 'Draft'}
                       </span>
                     </div>
                   </div>
-                ))}
-              </div>
-            </Card.Content>
-          </Card>
+                </Card.Content>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     </div>
